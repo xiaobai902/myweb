@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>智能监测 · 资产价值控制 + 手动刷新</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        /* ========== 样式保持不变，新增刷新按钮样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #f0f4fa;
+            min-height: 100vh;
+            padding: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dashboard {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(25, 60, 100, 0.3);
+            padding: 1.5rem 1.2rem 2rem 1.2rem;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+            color: #0f2b4f;
+            border-left: 6px solid #2b6ef0;
+            padding-left: 1rem;
+        }
+        h1 i {
+            background: #ffffff;
+            border-radius: 2rem;
+            padding: 0.4rem;
+            color: #2b6ef0;
+            box-shadow: 0 4px 8px rgba(0,80,160,0.15);
+        }
+        .device-section h2, .asset-control-section h2 {
+            font-size: 1.8rem;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #0f2b4f;
+            border-left: 6px solid #2b6ef0;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .history-header h2 {
+            font-size: 1.6rem;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #0f2b4f;
+            border-left: 6px solid #2b6ef0;
+            padding-left: 0.9rem;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+        @media (min-width: 500px) {
+            .cards-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 800px) {
+            .cards-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+        .sensor-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1rem 0.8rem 0.8rem 0.8rem;
+            box-shadow: 0 8px 18px -8px rgba(20, 50, 80, 0.2);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .sensor-card:active { transform: scale(0.98); }
+        .card-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #4b6382;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-label i {
+            font-size: 0.9rem;
+            color: #3b82f6;
+        }
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #123256;
+            word-break: break-word;
+            margin-bottom: 0.2rem;
+        }
+        .card-unit {
+            font-size: 0.8rem;
+            color: #627b9b;
+            font-weight: 500;
+            margin-left: 0.1rem;
+        }
+        .update-tag {
+            font-size: 0.65rem;
+            color: #7a8faa;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            margin-top: 0.3rem;
+            border-top: 1px dashed #d0dfef;
+            padding-top: 0.4rem;
+        }
+        .flame-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #dff0dd;
+            color: #1b6e3b;
+        }
+        .flame-badge.danger {
+            background: #ffdede;
+            color: #b41818;
+        }
+        .device-section, .asset-control-section {
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.2rem 1.2rem;
+            margin: 1.5rem 0 1.5rem 0;
+            border: 1px solid #ffffff;
+            box-shadow: 0 6px 14px rgba(35, 70, 110, 0.12);
+        }
+        .device-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .device-item {
+            background: #ffffff;
+            border-radius: 3rem;
+            padding: 0.7rem 1.2rem 0.7rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 4px 8px rgba(0,40,70,0.1);
+            border: 1px solid rgba(255,255,255,0.7);
+            flex: 1 1 auto;
+            min-width: 140px;
+            font-size: 1rem;
+            font-weight: 550;
+            color: #1b3a5e;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+        .device-item i {
+            color: #3f6ab3;
+            font-size: 1.1rem;
+            width: 1.4rem;
+        }
+        .device-state {
+            margin-left: auto;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            background: #eef3f9;
+            color: #2b4f73;
+            transition: all 0.2s ease;
+        }
+        .device-state.on {
+            background: #f5e9b1;
+            color: #8e6100;
+        }
+        .clickable-device {
+            cursor: pointer;
+        }
+        .clickable-device:hover {
+            background: #e6f0ff;
+            box-shadow: 0 6px 12px rgba(0,50,100,0.15);
+        }
+        .clickable-device:active {
+            transform: scale(0.96);
+            background: #d9e8ff;
+        }
+        .asset-control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            background: rgba(255,255,255,0.6);
+            padding: 1rem 1.2rem;
+            border-radius: 1.5rem;
+            align-items: flex-end;
+        }
+        .asset-control-group {
+            flex: 1;
+            min-width: 160px;
+        }
+        .asset-control-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2c4c7c;
+            margin-bottom: 0.4rem;
+        }
+        .asset-control-group input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #cbdbe0;
+            border-radius: 2rem;
+            font-size: 0.95rem;
+            background: white;
+            outline: none;
+            transition: 0.2s;
+        }
+        .asset-control-group input:focus {
+            border-color: #2b6ef0;
+            box-shadow: 0 0 0 3px rgba(43,110,240,0.2);
+        }
+        .asset-set-btn {
+            background: #2b6ef0;
+            border: none;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .asset-set-btn:hover {
+            background: #1a57d4;
+            transform: scale(0.98);
+        }
+        .asset-set-btn:active {
+            transform: scale(0.96);
+        }
+        .asset-set-btn:disabled {
+            background: #a0b8d0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .refresh-btn {
+            background: #4b7b9d;
+        }
+        .refresh-btn:hover {
+            background: #2c5a7a;
+        }
+        .current-asset-info {
+            font-size: 0.85rem;
+            color: #3a6ea5;
+            background: #eaf3ff;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 1rem 0 1rem;
+        }
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .chart-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1f4973;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chart-btn.active {
+            background: #2b6ef0;
+            color: white;
+            border-color: #2b6ef0;
+        }
+        .chart-btn:hover:not(.active) {
+            background: #e0edff;
+            border-color: #a8c8ff;
+        }
+        .chart-wrapper {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 1.8rem;
+            padding: 1rem 0.5rem 0.5rem;
+            border: 1px solid rgba(255,255,255,0.9);
+            margin-bottom: 1.8rem;
+        }
+        #historyChart {
+            width: 100%;
+            height: 250px;
+        }
+        .asset-table-section {
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            border-radius: 1.8rem;
+            padding: 1rem;
+            border: 1px solid white;
+        }
+        .asset-table-section h3 {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #173457;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 0.8rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 360px;
+        }
+        th {
+            background: #dae6f5;
+            padding: 0.75rem 0.5rem;
+            font-weight: 600;
+            color: #133456;
+        }
+        td {
+            padding: 0.65rem 0.5rem;
+            border-bottom: 1px solid #c9dcef;
+            text-align: center;
+        }
+        td:first-child, th:first-child { text-align: left; }
+        .asset-value {
+            font-weight: 600;
+            color: #156f3c;
+        }
+        .asset-card-id {
+            font-family: 'Courier New', monospace;
+            background: #ecf3fc;
+            padding: 0.1rem 0.5rem;
+            border-radius: 2rem;
+        }
+        .footer-note {
+            margin-top: 1.2rem;
+            font-size: 0.7rem;
+            color: #7e96b2;
+            text-align: right;
+        }
+        #toastMessage {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #1f3a5f;
+            color: #fff;
+            text-align: center;
+            border-radius: 40px;
+            padding: 12px 20px;
+            position: fixed;
+            z-index: 999;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,20,50,0.4);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: visibility 0.2s, opacity 0.2s;
+            opacity: 0;
+        }
+        #toastMessage.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <h1><i class="fas fa-chart-line"></i> 实时数据监测</h1>
+
+    <!-- 7个传感器卡片 -->
+    <div class="cards-grid">
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-temperature-high"></i>温度</div>
+            <div class="card-value"><span id="tempValue">--</span><span class="card-unit">°C</span></div>
+            <div class="update-tag" id="tempUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-tint"></i>湿度</div>
+            <div class="card-value"><span id="humiValue">--</span><span class="card-unit">%</span></div>
+            <div class="update-tag" id="humiUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-sun"></i>光照强度</div>
+            <div class="card-value"><span id="lightValue">--</span><span class="card-unit">Lux</span></div>
+            <div class="update-tag" id="lightUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-fire"></i>火焰报警</div>
+            <div class="card-value"><span id="flameText" class="flame-badge">--</span></div>
+            <div class="update-tag" id="flameUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-shield-halved"></i>红外防盗</div>
+            <div class="card-value"><span id="infraredText" class="flame-badge">--</span></div>
+            <div class="update-tag" id="infraredUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-coins"></i>资产价值</div>
+            <div class="card-value"><span id="assetQuantValue">--</span><span class="card-unit">元</span></div>
+            <div class="update-tag" id="assetQuantUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-id-card"></i>资产卡号</div>
+            <div class="card-value" style="font-size:1.3rem;" id="assetCardValue">--</div>
+            <div class="update-tag" id="assetCardUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
+        </div>
+    </div>
+
+    <!-- 设备控制中心 (LED & 蜂鸣器) -->
+    <div class="device-section">
+        <h2><i class="fas fa-sliders-h"></i> 设备控制中心</h2>
+        <div class="device-list">
+            <div class="device-item clickable-device" id="ledDevice">
+                <i class="fas fa-lightbulb"></i> LED灯
+                <span class="device-state" id="ledStateText">关闭</span>
+            </div>
+            <div class="device-item clickable-device" id="buzzerDevice">
+                <i class="fas fa-bell"></i> 蜂鸣器
+                <span class="device-state" id="buzzerStateText">关闭</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 资产控制区域：价值输入 + 设置按钮 + 刷新按钮 -->
+    <div class="asset-control-section">
+        <h2><i class="fas fa-dollar-sign"></i> 资产价值控制</h2>
+        <div class="asset-control-panel">
+            <div class="asset-control-group">
+                <label><i class="fas fa-edit"></i> 资产价值 (元)</label>
+                <input type="number" id="assetValueInput" step="0.01" placeholder="输入金额，例如 123.45">
+            </div>
+            <div class="asset-control-group" style="flex: 0 0 auto;">
+                <label>&nbsp;</label>
+                <button class="asset-set-btn" id="setAssetValueBtn"><i class="fas fa-save"></i> 设置价值</button>
+            </div>
+            <div class="asset-control-group" style="flex: 0 0 auto;">
+                <label>&nbsp;</label>
+                <button class="asset-set-btn refresh-btn" id="manualRefreshBtn"><i class="fas fa-sync-alt"></i> 立即刷新</button>
+            </div>
+        </div>
+        <div class="current-asset-info">
+            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> &nbsp; | &nbsp; 当前价值: <strong id="currentValueHint">--</strong> 元
+            <br><small style="display:inline-block; margin-left:0.5rem;">✨ 设置价值时将同时发送当前卡号（整数）到平台 | 点击刷新立即更新所有数据</small>
+        </div>
+    </div>
+
+    <!-- 历史趋势 -->
+    <div class="history-header">
+        <h2><i class="fas fa-chart-line"></i> 历史数据分析 (5小时)</h2>
+        <div class="chart-controls">
+            <button class="chart-btn active" id="btnTemp">🌡️ 温度</button>
+            <button class="chart-btn" id="btnHumi">💧 湿度</button>
+            <button class="chart-btn" id="btnLight">☀️ 光照</button>
+        </div>
+    </div>
+    <div class="chart-wrapper">
+        <div id="historyChart"></div>
+    </div>
+
+    <!-- 资产历史记录 -->
+    <div class="asset-table-section">
+        <h3><i class="fas fa-table"></i> 资产历史记录</h3>
+        <div class="table-responsive">
+            <table id="assetHistoryTable">
+                <thead><tr><th>时间</th><th>资产价值 (元)</th><th>资产卡号</th></tr></thead>
+                <tbody id="assetTableBody"><tr><td colspan="3" style="text-align:center;">加载历史数据中...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-sync-alt"></i> 全局刷新周期20秒 · 点击设备/设置资产后5秒刷新 · 手动刷新立即生效
+    </div>
+</div>
+
+<div id="toastMessage">提示消息</div>
+
+<script>
+(function() {
+    // DOM 元素
+    const tempSpan = document.getElementById('tempValue');
+    const humiSpan = document.getElementById('humiValue');
+    const lightSpan = document.getElementById('lightValue');
+    const flameSpan = document.getElementById('flameText');
+    const infraredSpan = document.getElementById('infraredText');
+    const assetQuantSpan = document.getElementById('assetQuantValue');
+    const assetCardSpan = document.getElementById('assetCardValue');
+    const currentCardIdHint = document.getElementById('currentCardIdHint');
+    const currentValueHint = document.getElementById('currentValueHint');
+
+    const tempUpdate = document.getElementById('tempUpdate');
+    const humiUpdate = document.getElementById('humiUpdate');
+    const lightUpdate = document.getElementById('lightUpdate');
+    const flameUpdate = document.getElementById('flameUpdate');
+    const infraredUpdate = document.getElementById('infraredUpdate');
+    const assetQuantUpdate = document.getElementById('assetQuantUpdate');
+    const assetCardUpdate = document.getElementById('assetCardUpdate');
+
+    const ledDevice = document.getElementById('ledDevice');
+    const buzzerDevice = document.getElementById('buzzerDevice');
+    const ledStateText = document.getElementById('ledStateText');
+    const buzzerStateText = document.getElementById('buzzerStateText');
+
+    const assetValueInput = document.getElementById('assetValueInput');
+    const setAssetValueBtn = document.getElementById('setAssetValueBtn');
+    const manualRefreshBtn = document.getElementById('manualRefreshBtn');
+
+    const btnTemp = document.getElementById('btnTemp');
+    const btnHumi = document.getElementById('btnHumi');
+    const btnLight = document.getElementById('btnLight');
+    const chartDom = document.getElementById('historyChart');
+    const myChart = echarts.init(chartDom);
+    const assetTbody = document.getElementById('assetTableBody');
+    const toastEl = document.getElementById('toastMessage');
+
+    // 常量
+    const IDS = {
+        TEMP: 'temperature_data',
+        HUMI: 'humidity_data',
+        LIGHT: 'light_intensity_value',
+        FLAME: 'flame_detected',
+        INFRARED: 'infrared_detected',
+        ASSET_QUANT: 'asset_quantity',
+        ASSET_CARD: 'rfid_card_id',
+        LED: 'led',
+        BUZZER: 'buzzer'
+    };
+
+    const chartSensors = [
+        { name: '温度', unit: '°C', id: IDS.TEMP, digits: 1, color: '#ff8c42' },
+        { name: '湿度', unit: '%RH', id: IDS.HUMI, digits: 1, color: '#3b9eff' },
+        { name: '光照', unit: 'Lux', id: IDS.LIGHT, digits: 0, color: '#f9d71c' }
+    ];
+    let currentChartIndex = 0;
+
+    const historyStore = {
+        [IDS.TEMP]: [],
+        [IDS.HUMI]: [],
+        [IDS.LIGHT]: [],
+        [IDS.ASSET_QUANT]: [],
+        [IDS.ASSET_CARD]: []
+    };
+
+    const AUTH_HEADER = 'version=2022-05-01&res=userid%2F359160&et=2132849584&method=sha1&sign=qdEGK8coKGtMoUW7JQ5RyYcuCs4%3D';
+    const REFRESH_INTERVAL = 20000;
+
+    let ledOn = false, buzzerOn = false;
+    let isProcessing = false;          // 用于设备控制/资产设置的锁
+    let isManualRefreshing = false;    // 手动刷新锁
+    let refreshTimer = null;
+
+    // 辅助函数
+    function showMessage(text, duration = 2500) {
+        toastEl.textContent = text;
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), duration);
+    }
+
+    function updateTimestamps() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        [tempUpdate, humiUpdate, lightUpdate, flameUpdate, infraredUpdate, assetQuantUpdate, assetCardUpdate].forEach(el => {
+            el.innerHTML = `<i class="far fa-clock"></i> 更新时间：${timeStr}`;
+        });
+    }
+
+    function formatFlameText(val) { return (val === true || val === 'true' || val === 1 || val === '1') ? '发现火灾' : '正常'; }
+    function formatInfraredText(val) { return (val === true || val === 'true' || val === 1 || val === '1') ? '有人入侵' : '正常'; }
+
+    function updateLedUI() {
+        ledStateText.innerText = ledOn ? '打开' : '关闭';
+        ledStateText.className = 'device-state' + (ledOn ? ' on' : '');
+    }
+    function updateBuzzerUI() {
+        buzzerStateText.innerText = buzzerOn ? '打开' : '关闭';
+        buzzerStateText.className = 'device-state' + (buzzerOn ? ' on' : '');
+    }
+
+    // API 请求
+    async function fetchHistoryForIdentifier(identifier) {
+        const now = Date.now();
+        const fiveHoursAgo = now - 5 * 60 * 60 * 1000;
+        const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property-history';
+        const params = {
+            product_id: 'ERq04kAJVy',
+            device_name: 'ESP8266',
+            identifier: identifier,
+            start_time: fiveHoursAgo.toString(),
+            end_time: now.toString()
+        };
+        const requestUrl = `${url}?${new URLSearchParams(params).toString()}`;
+        try {
+            const resp = await fetch(requestUrl, { headers: { 'Accept': 'application/json', 'authorization': AUTH_HEADER } });
+            const result = await resp.json();
+            if (result.code === 0 && result.data && Array.isArray(result.data.list)) {
+                return result.data.list.map(item => ({ time: item.time, value: item.value }));
+            }
+            return [];
+        } catch (e) { console.warn(`历史[${identifier}]失败`, e); return []; }
+    }
+
+    async function setMultipleDesired(paramsObj) {
+        const url = 'https://iot-api.heclouds.com/thingmodel/set-device-desired-property';
+        const body = {
+            product_id: 'ERq04kAJVy',
+            device_name: 'ESP8266',
+            params: paramsObj
+        };
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'authorization': AUTH_HEADER },
+                body: JSON.stringify(body)
+            });
+            const result = await resp.json();
+            return result.code === 0;
+        } catch (e) { console.warn('设置期望值失败', e); return false; }
+    }
+
+    async function setDeviceDesired(identifier, value) {
+        return setMultipleDesired({ [identifier]: value });
+    }
+
+    async function fetchRealtimeData() {
+        const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property';
+        const params = { product_id: 'ERq04kAJVy', device_name: 'ESP8266' };
+        const requestUrl = `${url}?${new URLSearchParams(params).toString()}`;
+        try {
+            const resp = await fetch(requestUrl, { headers: { 'Accept': 'application/json', 'authorization': AUTH_HEADER } });
+            const result = await resp.json();
+            if (result.code === 0 && Array.isArray(result.data)) {
+                const map = {};
+                result.data.forEach(item => { map[item.identifier] = item; });
+
+                if (map[IDS.TEMP]?.value !== undefined) tempSpan.textContent = parseFloat(map[IDS.TEMP].value).toFixed(1);
+                if (map[IDS.HUMI]?.value !== undefined) humiSpan.textContent = parseFloat(map[IDS.HUMI].value).toFixed(1);
+                if (map[IDS.LIGHT]?.value !== undefined) lightSpan.textContent = parseInt(map[IDS.LIGHT].value);
+
+                if (map[IDS.FLAME]?.value !== undefined) {
+                    const text = formatFlameText(map[IDS.FLAME].value);
+                    flameSpan.textContent = text;
+                    flameSpan.className = text === '发现火灾' ? 'flame-badge danger' : 'flame-badge';
+                }
+                if (map[IDS.INFRARED]?.value !== undefined) {
+                    const text = formatInfraredText(map[IDS.INFRARED].value);
+                    infraredSpan.textContent = text;
+                    infraredSpan.className = text === '有人入侵' ? 'flame-badge danger' : 'flame-badge';
+                }
+
+                if (map[IDS.ASSET_QUANT]?.value !== undefined) {
+                    const val = parseFloat(map[IDS.ASSET_QUANT].value).toFixed(2);
+                    assetQuantSpan.textContent = val;
+                    currentValueHint.textContent = val;
+                }
+                if (map[IDS.ASSET_CARD]?.value !== undefined) {
+                    let cardVal = map[IDS.ASSET_CARD].value;
+                    const cardStr = cardVal !== undefined && cardVal !== null ? cardVal.toString() : '--';
+                    assetCardSpan.textContent = cardStr;
+                    currentCardIdHint.textContent = cardStr;
+                }
+
+                if (map[IDS.LED]?.value !== undefined) {
+                    ledOn = (map[IDS.LED].value === true || map[IDS.LED].value === 1 || map[IDS.LED].value === '1');
+                    updateLedUI();
+                }
+                if (map[IDS.BUZZER]?.value !== undefined) {
+                    buzzerOn = (map[IDS.BUZZER].value === true || map[IDS.BUZZER].value === 1 || map[IDS.BUZZER].value === '1');
+                    updateBuzzerUI();
+                }
+            }
+        } catch (e) { console.warn('实时数据失败', e); }
+    }
+
+    function renderChart() {
+        const sensor = chartSensors[currentChartIndex];
+        const records = historyStore[sensor.id] || [];
+        const sorted = [...records].sort((a, b) => a.time - b.time);
+        const times = sorted.map(r => new Date(r.time).toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' }));
+        const values = sorted.map(r => parseFloat(r.value));
+        const hasData = times.length > 0;
+        const option = {
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (params) => `${params[0].name}<br/><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${sensor.color};"></span>${sensor.name} : ${params[0].value?.toFixed(sensor.digits) ?? '--'} ${sensor.unit}` },
+            grid: { left: '10%', right: '8%', top: '18%', bottom: '12%' },
+            xAxis: { type: 'category', data: hasData ? times : ['无数据'], axisLabel: { fontSize: 9, rotate: 15 } },
+            yAxis: { type: 'value', name: `(${sensor.unit})` },
+            series: [{ data: hasData ? values : [0], type: 'line', smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { width: 3, color: sensor.color }, areaStyle: { color: sensor.color + '20' } }]
+        };
+        myChart.setOption(option, { replaceMerge: ['series'] });
+    }
+
+    function renderAssetTable() {
+        const quantRecords = historyStore[IDS.ASSET_QUANT] || [];
+        const cardRecords = historyStore[IDS.ASSET_CARD] || [];
+        const timeMap = new Map();
+        quantRecords.forEach(item => { if (!timeMap.has(item.time)) timeMap.set(item.time, { quant: null, card: null }); timeMap.get(item.time).quant = item.value; });
+        cardRecords.forEach(item => { if (!timeMap.has(item.time)) timeMap.set(item.time, { quant: null, card: null }); timeMap.get(item.time).card = item.value; });
+        const validTimes = Array.from(timeMap.keys()).filter(ts => timeMap.get(ts).quant !== null && timeMap.get(ts).card !== null).sort((a,b)=>b-a);
+        if (validTimes.length === 0) {
+            assetTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">暂无有效资产记录</td></tr>';
+            return;
+        }
+        let html = '';
+        validTimes.forEach(ts => {
+            const entry = timeMap.get(ts);
+            const timeStr = new Date(parseInt(ts)).toLocaleTimeString('zh-CN', { hour12: false });
+            html += `<tr><td>${timeStr}</td><td class="asset-value">${parseFloat(entry.quant).toFixed(2)} 元</td><td><span class="asset-card-id">${entry.card}</span></td></tr>`;
+        });
+        assetTbody.innerHTML = html;
+    }
+
+    // 核心刷新函数（可被定时器或手动调用）
+    async function refreshAllData() {
+        const identifiers = [IDS.TEMP, IDS.HUMI, IDS.LIGHT, IDS.ASSET_QUANT, IDS.ASSET_CARD];
+        const promises = identifiers.map(id => fetchHistoryForIdentifier(id));
+        const results = await Promise.allSettled(promises);
+        results.forEach((res, idx) => { if (res.status === 'fulfilled') historyStore[identifiers[idx]] = res.value; });
+        renderChart();
+        renderAssetTable();
+        await fetchRealtimeData();
+        updateTimestamps();
+    }
+
+    // 设备控制（LED/蜂鸣器）
+    async function handleDeviceClick(deviceType) {
+        if (isProcessing) { showMessage('操作进行中，请稍后...', 1500); return; }
+        let targetState, identifier, deviceName;
+        if (deviceType === 'led') { targetState = !ledOn; identifier = IDS.LED; deviceName = 'LED'; }
+        else if (deviceType === 'buzzer') { targetState = !buzzerOn; identifier = IDS.BUZZER; deviceName = '蜂鸣器'; }
+        else return;
+        const value = targetState ? 1 : 0;
+        isProcessing = true;
+        ledDevice.style.pointerEvents = 'none';
+        buzzerDevice.style.pointerEvents = 'none';
+        try {
+            const success = await setDeviceDesired(identifier, value);
+            if (success) {
+                if (deviceType === 'led') { ledOn = targetState; updateLedUI(); }
+                else { buzzerOn = targetState; updateBuzzerUI(); }
+                showMessage(`${deviceName} ${targetState ? '打开' : '关闭'}成功，5秒后刷新数据`, 2000);
+                if (refreshTimer) clearTimeout(refreshTimer);
+                refreshTimer = setTimeout(() => { refreshAllData(); refreshTimer = null; }, 5000);
+            } else { showMessage(`${deviceName}操作失败，请重试`, 2000); }
+        } catch(e) { showMessage('网络异常，操作失败', 2000); }
+        finally { isProcessing = false; ledDevice.style.pointerEvents = ''; buzzerDevice.style.pointerEvents = ''; }
+    }
+
+    // 资产价值设置：同时发送价值 + 当前卡号（卡号强制转换为整数）
+    async function handleSetAssetValue() {
+        let rawValue = assetValueInput.value.trim();
+        if (rawValue === "") { showMessage("请输入资产价值", 1500); return; }
+        let numValue = parseFloat(rawValue);
+        if (isNaN(numValue)) { showMessage("请输入有效的数字", 1500); return; }
+
+        let cardStr = currentCardIdHint.textContent;
+        if (!cardStr || cardStr === "--") {
+            showMessage("当前未获取到资产卡号，请稍后重试", 2000);
+            return;
+        }
+        let cardInt = parseInt(cardStr, 10);
+        if (isNaN(cardInt)) {
+            showMessage("卡号格式错误，无法转换为整数", 2000);
+            return;
+        }
+
+        if (isProcessing) { showMessage("操作进行中，请稍后", 1500); return; }
+        isProcessing = true;
+        setAssetValueBtn.disabled = true;
+        try {
+            const success = await setMultipleDesired({
+                [IDS.ASSET_QUANT]: numValue,
+                [IDS.ASSET_CARD]: cardInt
+            });
+            if (success) {
+                showMessage(`资产价值设置为 ${numValue.toFixed(2)} 元，卡号 ${cardInt} 已同步，5秒后刷新`, 2500);
+                if (refreshTimer) clearTimeout(refreshTimer);
+                refreshTimer = setTimeout(() => { refreshAllData(); refreshTimer = null; }, 5000);
+            } else { showMessage("设置资产失败，请重试", 2000); }
+        } catch(e) { showMessage("网络错误，操作失败", 2000); }
+        finally { isProcessing = false; setAssetValueBtn.disabled = false; }
+    }
+
+    // 手动刷新按钮点击处理
+    async function handleManualRefresh() {
+        if (isManualRefreshing) {
+            showMessage("正在刷新中，请稍后...", 1500);
+            return;
+        }
+        isManualRefreshing = true;
+        manualRefreshBtn.disabled = true;
+        showMessage("正在刷新数据...", 1000);
+        try {
+            await refreshAllData();
+            showMessage("数据刷新成功", 1500);
+        } catch (error) {
+            console.error("刷新失败", error);
+            showMessage("刷新失败，请检查网络", 2000);
+        } finally {
+            isManualRefreshing = false;
+            manualRefreshBtn.disabled = false;
+        }
+    }
+
+    // 事件绑定
+    ledDevice.addEventListener('click', () => handleDeviceClick('led'));
+    buzzerDevice.addEventListener('click', () => handleDeviceClick('buzzer'));
+    setAssetValueBtn.addEventListener('click', handleSetAssetValue);
+    manualRefreshBtn.addEventListener('click', handleManualRefresh);
+
+    function setActiveChartButton(index) {
+        [btnTemp, btnHumi, btnLight].forEach((btn, i) => btn.classList.toggle('active', i === index));
+    }
+    function switchChart(index) { if (currentChartIndex === index) return; currentChartIndex = index; setActiveChartButton(index); renderChart(); }
+    btnTemp.addEventListener('click', () => switchChart(0));
+    btnHumi.addEventListener('click', () => switchChart(1));
+    btnLight.addEventListener('click', () => switchChart(2));
+    window.addEventListener('resize', () => myChart.resize());
+
+    // 启动
+    refreshAllData();
+    setInterval(refreshAllData, REFRESH_INTERVAL);
+    updateLedUI();
+    updateBuzzerUI();
+    setActiveChartButton(0);
+})();
+</script>
+</body>
+</html>
