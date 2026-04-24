@@ -3,860 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>冰箱 · 智能监测 FRidge26</title>
-    <!-- Font Awesome 6 -->
+    <title>冰箱 · 智能监测 FRidge26 (模拟测试)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- ECharts -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js">
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            background: #e9f2f5;
-            min-height: 100vh;
-            padding: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #e9f2f5; min-height: 100vh; padding: 0.8rem;
+            display: flex; align-items: center; justify-content: center;
         }
         .dashboard {
-            max-width: 1200px;
-            width: 100%;
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 2.2rem;
-            box-shadow: 0 20px 35px -10px rgba(15, 65, 95, 0.25);
-            padding: 1.6rem 1.2rem 2rem 1.2rem;
-            border: 1px solid rgba(255,255,255,0.9);
+            max-width: 1200px; width: 100%; background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px); border-radius: 2.2rem;
+            box-shadow: 0 20px 35px -10px rgba(15,65,95,0.25);
+            padding: 1.6rem 1.2rem 2rem; border: 1px solid rgba(255,255,255,0.9);
         }
-        h1 {
-            font-size: 1.9rem;
-            font-weight: 650;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 1.8rem;
-            color: #124066;
-            border-left: 6px solid #2b6ef0;
-            padding-left: 1.2rem;
-        }
-        h1 i {
-            background: #ffffff;
-            border-radius: 2rem;
-            padding: 0.4rem;
-            color: #2b6ef0;
-            box-shadow: 0 4px 8px rgba(0,80,160,0.15);
-        }
-        .device-section h2, .asset-control-section h2 {
-            font-size: 1.6rem;
-            font-weight: 650;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            color: #124066;
-            border-left: 6px solid #2b6ef0;
-            padding-left: 1rem;
-            margin-bottom: 1.2rem;
-        }
-        .history-header h2 {
-            font-size: 1.5rem;
-            font-weight: 650;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #124066;
-            border-left: 6px solid #2b6ef0;
-            padding-left: 0.9rem;
-        }
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.8rem;
-        }
-        @media (min-width: 500px) {
-            .cards-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (min-width: 800px) {
-            .cards-grid { grid-template-columns: repeat(6, 1fr); }
-        }
-        .sensor-card {
-            background: #ffffff;
-            border-radius: 1.5rem;
-            padding: 1rem 0.8rem 0.8rem 0.8rem;
-            box-shadow: 0 8px 18px -8px rgba(15, 60, 90, 0.15);
-            border: 1px solid rgba(255,255,255,0.9);
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .sensor-card:active { transform: scale(0.98); }
-        .card-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #3a6282;
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-            margin-bottom: 0.5rem;
-        }
-        .card-label i {
-            font-size: 0.9rem;
-            color: #2b6ef0;
-        }
-        .card-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            line-height: 1.2;
-            color: #103450;
-            word-break: break-word;
-            margin-bottom: 0.2rem;
-        }
-        .card-unit {
-            font-size: 0.8rem;
-            color: #56759b;
-            font-weight: 500;
-            margin-left: 0.1rem;
-        }
-        .update-tag {
-            font-size: 0.65rem;
-            color: #6882a0;
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-            margin-top: 0.3rem;
-            border-top: 1px dashed #bcd0e6;
-            padding-top: 0.4rem;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 0.3rem 1rem;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            background: #e2f0e6;
-            color: #1a6e4b;
-        }
-        .status-badge.on {
-            background: #feeec8;
-            color: #a86903;
-        }
-        .device-section, .asset-control-section {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 2rem;
-            padding: 1.2rem 1.4rem;
-            margin: 1.5rem 0 1.5rem 0;
-            border: 1px solid #ffffff;
-            box-shadow: 0 6px 14px rgba(25, 70, 110, 0.08);
-        }
-        .device-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.9rem;
-        }
-        .device-item {
-            background: #ffffff;
-            border-radius: 3rem;
-            padding: 0.8rem 1.5rem 0.8rem 1.2rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            box-shadow: 0 4px 8px rgba(0,40,70,0.08);
-            border: 1px solid rgba(255,255,255,0.8);
-            flex: 1 1 auto;
-            min-width: 150px;
-            font-size: 1rem;
-            font-weight: 550;
-            color: #1b3a5e;
-            transition: all 0.2s ease;
-            cursor: default;
-        }
-        .device-item i {
-            color: #2b6ef0;
-            font-size: 1.2rem;
-            width: 1.6rem;
-        }
-        .device-state {
-            margin-left: auto;
-            font-weight: 600;
-            padding: 0.2rem 1.2rem;
-            border-radius: 30px;
-            background: #eef3f9;
-            color: #2b4f73;
-            transition: all 0.2s;
-        }
-        .device-state.on {
-            background: #faeec2;
-            color: #8a5f00;
-        }
-        .clickable-device {
-            cursor: pointer;
-        }
-        .clickable-device:hover {
-            background: #e3efff;
-            box-shadow: 0 6px 12px rgba(0,60,120,0.12);
-        }
-        .clickable-device:active {
-            transform: scale(0.97);
-            background: #d0e4ff;
-        }
-        .asset-control-panel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 0.8rem;
-            background: rgba(255,255,255,0.5);
-            padding: 1.2rem 1.2rem;
-            border-radius: 1.8rem;
-            align-items: flex-end;
-        }
-        .asset-control-group {
-            flex: 1;
-            min-width: 160px;
-        }
-        .asset-control-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1f4770;
-            margin-bottom: 0.4rem;
-        }
-        .asset-control-group input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #bfd6e9;
-            border-radius: 2.5rem;
-            font-size: 0.95rem;
-            background: white;
-            outline: none;
-            transition: 0.2s;
-        }
-        .asset-control-group input:focus {
-            border-color: #2b6ef0;
-            box-shadow: 0 0 0 3px rgba(43,110,240,0.2);
-        }
-        .asset-set-btn {
-            background: #2b6ef0;
-            border: none;
-            color: white;
-            padding: 0.75rem 1.6rem;
-            border-radius: 2.5rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            white-space: nowrap;
-        }
-        .asset-set-btn:hover {
-            background: #1a57d4;
-            transform: scale(0.98);
-        }
-        .asset-set-btn:active {
-            transform: scale(0.96);
-        }
-        .asset-set-btn:disabled {
-            background: #a0b8d0;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .refresh-btn {
-            background: #386f9e;
-        }
-        .refresh-btn:hover {
-            background: #1e4f77;
-        }
-        .current-asset-info {
-            font-size: 0.85rem;
-            color: #2660a2;
-            background: #e3f0fd;
-            border-radius: 2.5rem;
-            padding: 0.5rem 1.3rem;
-            display: inline-flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-        .history-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin: 1rem 0 1rem;
-        }
-        .chart-controls {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .chart-btn {
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 2rem;
-            padding: 0.4rem 1.3rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #1f4973;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .chart-btn.active {
-            background: #2b6ef0;
-            color: white;
-            border-color: #2b6ef0;
-        }
-        .chart-wrapper {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 1.8rem;
-            padding: 1rem 0.5rem 0.5rem;
-            border: 1px solid rgba(255,255,255,0.9);
-            margin-bottom: 1.8rem;
-        }
-        #historyChart {
-            width: 100%;
-            height: 250px;
-        }
-        .asset-table-section {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 1.8rem;
-            padding: 1.2rem;
-            border: 1px solid white;
-        }
-        .asset-table-section h3 {
-            font-size: 1.3rem;
-            font-weight: 650;
-            color: #173457;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-left: 4px solid #2b6ef0;
-            padding-left: 1rem;
-        }
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: 1rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 360px;
-        }
-        th {
-            background: #d9e7f5;
-            padding: 0.75rem 0.5rem;
-            font-weight: 600;
-            color: #103959;
-        }
-        td {
-            padding: 0.7rem 0.5rem;
-            border-bottom: 1px solid #c5d9ee;
-            text-align: center;
-        }
-        td:first-child, th:first-child { text-align: left; }
-        .weight-value {
-            font-weight: 600;
-            color: #1c6b4a;
-        }
-        .asset-card-id {
-            font-family: 'Courier New', monospace;
-            background: #e5effa;
-            padding: 0.1rem 0.6rem;
-            border-radius: 2rem;
-        }
-        .footer-note {
-            margin-top: 1.5rem;
-            font-size: 0.7rem;
-            color: #6b8aaa;
-            text-align: right;
-        }
-        #toastMessage {
-            visibility: hidden;
-            min-width: 200px;
-            background-color: #1a3c5e;
-            color: #fff;
-            text-align: center;
-            border-radius: 40px;
-            padding: 12px 22px;
-            position: fixed;
-            z-index: 999;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.95rem;
-            font-weight: 500;
-            box-shadow: 0 10px 25px rgba(0,20,50,0.4);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: visibility 0.2s, opacity 0.2s;
-            opacity: 0;
-        }
-        #toastMessage.show {
-            visibility: visible;
-            opacity: 1;
-        }
+        h1 { font-size: 1.9rem; font-weight: 650; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.8rem; color: #124066; border-left: 6px solid #2b6ef0; padding-left: 1.2rem; }
+        h1 i { background: white; border-radius: 2rem; padding: 0.4rem; color: #2b6ef0; box-shadow: 0 4px 8px rgba(0,80,160,0.15); }
+        .device-section h2, .asset-control-section h2 { font-size: 1.6rem; font-weight: 650; display: flex; align-items: center; gap: 0.6rem; color: #124066; border-left: 6px solid #2b6ef0; padding-left: 1rem; margin-bottom: 1.2rem; }
+        .cards-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.8rem; }
+        @media (min-width:500px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+        @media (min-width:800px){.cards-grid{grid-template-columns:repeat(6,1fr)}}
+        .sensor-card { background: white; border-radius: 1.5rem; padding: 1rem 0.8rem; box-shadow: 0 8px 18px -8px rgba(15,60,90,0.15); transition: 0.2s; display: flex; flex-direction: column; }
+        .sensor-card:active{transform:scale(0.98)}
+        .card-label{font-size:0.7rem;font-weight:600;color:#3a6282;display:flex;align-items:center;gap:0.2rem;margin-bottom:0.5rem}
+        .card-label i{font-size:0.9rem;color:#2b6ef0}
+        .card-value{font-size:1.8rem;font-weight:700;color:#103450;margin-bottom:0.2rem}
+        .card-unit{font-size:0.8rem;color:#56759b;font-weight:500;margin-left:0.1rem}
+        .update-tag{font-size:0.65rem;color:#6882a0;display:flex;align-items:center;gap:0.2rem;margin-top:0.3rem;border-top:1px dashed #bcd0e6;padding-top:0.4rem}
+        .status-badge{display:inline-block;padding:0.3rem 1rem;border-radius:30px;font-size:0.9rem;font-weight:600;background:#e2f0e6;color:#1a6e4b}
+        .status-badge.on{background:#feeec8;color:#a86903}
+        .status-badge.expired{background:#ffe0e0;color:#b91c1c}
+        .device-section,.asset-control-section{background:rgba(255,255,255,0.5);backdrop-filter:blur(4px);border-radius:2rem;padding:1.2rem 1.4rem;margin:1.5rem 0;border:1px solid white;box-shadow:0 6px 14px rgba(25,70,110,0.08)}
+        .device-list{display:flex;flex-wrap:wrap;gap:0.9rem}
+        .device-item{background:white;border-radius:3rem;padding:0.8rem 1.5rem 0.8rem 1.2rem;display:inline-flex;align-items:center;gap:0.8rem;box-shadow:0 4px 8px rgba(0,40,70,0.08);flex:1 1 auto;min-width:150px;font-weight:550;color:#1b3a5e;transition:0.2s}
+        .device-item i{color:#2b6ef0;font-size:1.2rem;width:1.6rem}
+        .device-state{margin-left:auto;font-weight:600;padding:0.2rem 1.2rem;border-radius:30px;background:#eef3f9;color:#2b4f73}
+        .device-state.on{background:#faeec2;color:#8a5f00}
+        .clickable-device{cursor:pointer}
+        .clickable-device:hover{background:#e3efff;box-shadow:0 6px 12px rgba(0,60,120,0.12)}
+        .clickable-device:active{transform:scale(0.97);background:#d0e4ff}
+        .asset-control-panel{display:flex;flex-wrap:wrap;gap:0.8rem;margin-top:0.8rem;background:rgba(255,255,255,0.5);padding:1.2rem;border-radius:1.8rem;align-items:flex-end}
+        .asset-control-group{flex:1;min-width:120px}
+        .asset-control-group label{display:block;font-size:0.8rem;font-weight:600;color:#1f4770;margin-bottom:0.4rem}
+        .asset-control-group input{width:100%;padding:0.75rem 0.9rem;border:1px solid #bfd6e9;border-radius:2.5rem;font-size:0.9rem;outline:none;transition:0.2s;background:white}
+        .asset-control-group input:focus{border-color:#2b6ef0;box-shadow:0 0 0 3px rgba(43,110,240,0.2)}
+        .asset-set-btn{background:#2b6ef0;border:none;color:white;padding:0.75rem 1.4rem;border-radius:2.5rem;font-weight:600;font-size:0.9rem;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:0.5rem;white-space:nowrap;height:44px}
+        .asset-set-btn:hover{background:#1a57d4;transform:scale(0.98)}
+        .asset-set-btn:active{transform:scale(0.96)}
+        .asset-set-btn:disabled{background:#a0b8d0;cursor:not-allowed}
+        .refresh-btn{background:#386f9e}
+        .refresh-btn:hover{background:#1e4f77}
+        .current-asset-info{font-size:0.85rem;color:#2660a2;background:#e3f0fd;border-radius:2.5rem;padding:0.5rem 1.3rem;display:inline-flex;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-top:0.8rem}
+        .history-header{display:flex;align-items:center;justify-content:space-between;margin:1rem 0}
+        .chart-btn{background:white;border:1px solid #cbd5e1;border-radius:2rem;padding:0.4rem 1.3rem;font-size:0.9rem;font-weight:500;color:#1f4973;cursor:pointer;transition:0.2s}
+        .chart-btn.active{background:#2b6ef0;color:white;border-color:#2b6ef0}
+        .chart-wrapper{background:rgba(255,255,255,0.5);backdrop-filter:blur(4px);border-radius:1.8rem;padding:1rem 0.5rem 0.5rem;border:1px solid white;margin-bottom:1.8rem}
+        #historyChart{width:100%;height:250px}
+        .asset-table-section{background:rgba(255,255,255,0.5);backdrop-filter:blur(4px);border-radius:1.8rem;padding:1.2rem;border:1px solid white}
+        .asset-table-section h3{font-size:1.3rem;font-weight:650;color:#173457;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;border-left:4px solid #2b6ef0;padding-left:1rem}
+        .table-responsive{overflow-x:auto;border-radius:1rem;max-height:400px;overflow-y:auto}
+        table{width:100%;border-collapse:collapse;font-size:0.82rem;min-width:700px}
+        th{background:#d9e7f5;padding:0.75rem 0.4rem;font-weight:600;color:#103959;position:sticky;top:0}
+        td{padding:0.65rem 0.4rem;border-bottom:1px solid #c5d9ee;text-align:center}
+        td:first-child,th:first-child{text-align:left}
+        .weight-value{font-weight:600;color:#1c6b4a}
+        .asset-card-id{font-family:'Courier New',monospace;background:#e5effa;padding:0.1rem 0.6rem;border-radius:2rem}
+        .food-name-tag{font-weight:600;color:#1f3d5e;max-width:120px;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+        .footer-note{margin-top:1.5rem;font-size:0.7rem;color:#6b8aaa;text-align:right}
+        #toastMessage{visibility:hidden;min-width:200px;background:#1a3c5e;color:white;text-align:center;border-radius:40px;padding:12px 22px;position:fixed;z-index:9999;bottom:30px;left:50%;transform:translateX(-50%);font-size:0.95rem;box-shadow:0 10px 25px rgba(0,20,50,0.4);opacity:0;transition:0.2s;pointer-events:none}
+        #toastMessage.show{visibility:visible;opacity:1}
+        .alert-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .alert-dialog{background:white;border-radius:1.8rem;padding:1.8rem 1.5rem;max-width:500px;width:90%;box-shadow:0 25px 50px rgba(0,0,0,0.35);border:3px solid #ef4444;animation:shakeIn 0.4s;max-height:80vh;overflow-y:auto}
+        @keyframes shakeIn{0%{transform:translateY(-30px);opacity:0}50%{transform:translateY(8px)}80%{transform:translateY(-3px)}100%{transform:translateY(0);opacity:1}}
+        .alert-dialog .alert-icon{font-size:3rem;text-align:center;color:#ef4444;margin-bottom:0.6rem;animation:pulse 1s infinite}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+        .alert-dialog h3{font-size:1.4rem;color:#991b1b;text-align:center;margin-bottom:0.8rem}
+        .alert-list{background:#fef2f2;border-radius:1rem;padding:0.8rem 1rem;margin:0.8rem 0;list-style:none;max-height:200px;overflow-y:auto}
+        .alert-list li{padding:0.4rem 0;border-bottom:1px dashed #fca5a5;font-size:0.9rem;color:#7f1d1d}
+        .alert-list li:last-child{border-bottom:none}
+        .alert-close-btn{display:block;margin:1rem auto 0;background:#ef4444;color:white;border:none;padding:0.75rem 2.5rem;border-radius:2.5rem;font-weight:700;font-size:1rem;cursor:pointer;transition:0.2s}
+        .alert-close-btn:hover{background:#dc2626;transform:scale(0.96)}
+        .test-badge { background: #f59e0b; color: white; font-size: 0.75rem; padding: 0.2rem 0.8rem; border-radius: 2rem; margin-left: 0.5rem; }
     </style>
 </head>
 <body>
 <div class="dashboard">
-    <h1><i class="fas fa-temperature-low"></i> 冰箱 · 状态监测 FRidge26</h1>
+    <h1><i class="fas fa-temperature-low"></i> 冰箱 · 智能监测 FRidge26 <span class="test-badge">🧪 模拟测试</span></h1>
 
-    <!-- 6个核心卡片：温/湿/重量/LED/蜂鸣器/卡号 -->
+    <!-- 6个核心卡片 -->
     <div class="cards-grid">
-        <div class="sensor-card">
-            <div class="card-label"><i class="fas fa-thermometer-half"></i> 温度</div>
-            <div class="card-value"><span id="tempValue">--</span><span class="card-unit">°C</span></div>
-            <div class="update-tag" id="tempUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
-        </div>
-        <div class="sensor-card">
-            <div class="card-label"><i class="fas fa-tint"></i> 湿度</div>
-            <div class="card-value"><span id="humiValue">--</span><span class="card-unit">%</span></div>
-            <div class="update-tag" id="humiUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
-        </div>
-        <div class="sensor-card">
-            <div class="card-label"><i class="fas fa-weight-hanging"></i> 重量</div>
-            <div class="card-value"><span id="weightValue">--</span><span class="card-unit">kg</span></div>
-            <div class="update-tag" id="weightUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
-        </div>
-        <div class="sensor-card">
-            <div class="card-label"><i class="fas fa-lightbulb"></i> LED状态</div>
-            <div class="card-value"><span id="ledCardStatus" class="status-badge">--</span></div>
-            <div class="update-tag" id="ledCardUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
-        </div>
-        <div class="sensor-card">
-            <div class="card-label"><i class="fas fa-bell"></i> 蜂鸣器</div>
-            <div class="card-value"><span id="buzzerCardStatus" class="status-badge">--</span></div>
-            <div class="update-tag" id="buzzerCardUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
-        </div>
-        <div class="sensor-card">
-            <div class="card-label"><i class="fas fa-id-card"></i> 资产卡号</div>
-            <div class="card-value" style="font-size:1.2rem;" id="assetCardValue">--</div>
-            <div class="update-tag" id="assetCardUpdate"><i class="far fa-clock"></i> 更新时间：--:--:--</div>
-        </div>
+        <div class="sensor-card"><div class="card-label"><i class="fas fa-thermometer-half"></i> 温度</div><div class="card-value"><span id="tempValue">--</span><span class="card-unit">°C</span></div><div class="update-tag" id="tempUpdate"></div></div>
+        <div class="sensor-card"><div class="card-label"><i class="fas fa-tint"></i> 湿度</div><div class="card-value"><span id="humiValue">--</span><span class="card-unit">%</span></div><div class="update-tag" id="humiUpdate"></div></div>
+        <div class="sensor-card"><div class="card-label"><i class="fas fa-weight-hanging"></i> 重量</div><div class="card-value"><span id="weightValue">--</span><span class="card-unit">kg</span></div><div class="update-tag" id="weightUpdate"></div></div>
+        <div class="sensor-card"><div class="card-label"><i class="fas fa-lightbulb"></i> LED状态</div><div class="card-value"><span id="ledCardStatus" class="status-badge">--</span></div><div class="update-tag" id="ledCardUpdate"></div></div>
+        <div class="sensor-card"><div class="card-label"><i class="fas fa-bell"></i> 蜂鸣器</div><div class="card-value"><span id="buzzerCardStatus" class="status-badge">--</span></div><div class="update-tag" id="buzzerCardUpdate"></div></div>
+        <div class="sensor-card"><div class="card-label"><i class="fas fa-id-card"></i> 资产卡号</div><div class="card-value" style="font-size:1.2rem;" id="assetCardValue">--</div><div class="update-tag" id="assetCardUpdate"></div></div>
     </div>
 
-    <!-- 设备控制中心 (LED & 蜂鸣器) 点击切换 -->
+    <!-- 设备控制 -->
     <div class="device-section">
         <h2><i class="fas fa-sliders-h"></i> 设备控制中心</h2>
         <div class="device-list">
-            <div class="device-item clickable-device" id="ledDevice">
-                <i class="fas fa-lightbulb"></i> LED灯
-                <span class="device-state" id="ledStateText">关闭</span>
-            </div>
-            <div class="device-item clickable-device" id="buzzerDevice">
-                <i class="fas fa-bell"></i> 蜂鸣器
-                <span class="device-state" id="buzzerStateText">关闭</span>
-            </div>
+            <div class="device-item clickable-device" id="ledDevice"><i class="fas fa-lightbulb"></i> LED灯 <span class="device-state" id="ledStateText">关闭</span></div>
+            <div class="device-item clickable-device" id="buzzerDevice"><i class="fas fa-bell"></i> 蜂鸣器 <span class="device-state" id="buzzerStateText">关闭</span></div>
         </div>
     </div>
 
-    <!-- 重量 & 卡号 控制区 -->
+    <!-- 食物录入 -->
     <div class="asset-control-section">
-        <h2><i class="fas fa-balance-scale"></i> 重量与卡号控制</h2>
+        <h2><i class="fas fa-balance-scale"></i> 重量、卡号与食物管理</h2>
         <div class="asset-control-panel">
-            <div class="asset-control-group">
-                <label><i class="fas fa-weight-scale"></i> 设定重量 (kg)</label>
-                <input type="number" id="weightInput" step="1" min="0" max="6000" placeholder="例如 125">
-            </div>
-            <div class="asset-control-group" style="flex: 0 0 auto;">
-                <label>&nbsp;</label>
-                <button class="asset-set-btn" id="setWeightBtn"><i class="fas fa-save"></i> 设置重量</button>
-            </div>
-            <div class="asset-control-group" style="flex: 0 0 auto;">
-                <label>&nbsp;</label>
-                <button class="asset-set-btn refresh-btn" id="manualRefreshBtn"><i class="fas fa-sync-alt"></i> 立即刷新</button>
-            </div>
+            <div class="asset-control-group"><label><i class="fas fa-apple-alt"></i> 食物名称</label><input type="text" id="foodNameInput" placeholder="例如：牛奶"></div>
+            <div class="asset-control-group"><label><i class="fas fa-weight-scale"></i> 设定重量 (kg)</label><input type="number" id="weightInput" step="1" min="0" max="6000" placeholder="125"></div>
+            <div class="asset-control-group"><label><i class="fas fa-calendar-alt"></i> 保质期 (天)</label><input type="number" id="shelfLifeInput" step="1" min="1" max="365" placeholder="7"></div>
+            <div class="asset-control-group" style="flex:0 0 auto;"><label>&nbsp;</label><button class="asset-set-btn" id="setWeightBtn"><i class="fas fa-save"></i> 录入食物</button></div>
+            <div class="asset-control-group" style="flex:0 0 auto;"><label>&nbsp;</label><button class="asset-set-btn refresh-btn" id="manualRefreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button></div>
         </div>
         <div class="current-asset-info">
-            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> &nbsp; | &nbsp; 当前重量: <strong id="currentWeightHint">--</strong> kg
-            <span style="display:inline-block; margin-left:0.8rem;">✨ 设置重量时自动同步当前卡号 (整数) 至平台</span>
+            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> | 当前重量: <strong id="currentWeightHint">--</strong> kg
+            <span style="margin-left:0.6rem;">🧪 测试模式：1天=2秒</span>
         </div>
     </div>
 
-    <!-- 历史趋势 (温度/湿度/重量) -->
-    <div class="history-header">
-        <h2><i class="fas fa-chart-line"></i> 历史趋势 (近5小时)</h2>
-        <div class="chart-controls">
-            <button class="chart-btn active" id="btnTemp">🌡️ 温度</button>
-            <button class="chart-btn" id="btnHumi">💧 湿度</button>
-            <button class="chart-btn" id="btnWeight">⚖️ 重量</button>
-        </div>
-    </div>
-    <div class="chart-wrapper">
-        <div id="historyChart"></div>
-    </div>
+    <!-- 趋势图 -->
+    <div class="history-header"><h2><i class="fas fa-chart-line"></i> 历史趋势</h2><div class="chart-controls"><button class="chart-btn active" id="btnTemp">🌡️ 温度</button><button class="chart-btn" id="btnHumi">💧 湿度</button><button class="chart-btn" id="btnWeight">⚖️ 重量</button></div></div>
+    <div class="chart-wrapper"><div id="historyChart"></div></div>
 
-    <!-- 重量+卡号 历史记录表 -->
+    <!-- 历史记录表 -->
     <div class="asset-table-section">
-        <h3><i class="fas fa-history"></i> 重量与卡号历史记录</h3>
+        <h3><i class="fas fa-history"></i> 食物录入历史</h3>
         <div class="table-responsive">
-            <table id="assetHistoryTable">
-                <thead><tr><th>时间</th><th>重量 (kg)</th><th>资产卡号</th></tr></thead>
-                <tbody id="assetTableBody"><tr><td colspan="3" style="text-align:center;">加载历史数据中...</td></tr></tbody>
-            </table>
+            <table><thead><tr><th>录入时间</th><th>食物</th><th>重量</th><th>卡号</th><th>保质期(天)</th><th>到期时间</th><th>状态</th></tr></thead>
+            <tbody id="assetTableBody"></tbody></table>
         </div>
     </div>
-    <div class="footer-note">
-        <i class="fas fa-sync-alt"></i> 自动刷新周期20秒 · 点击设备/设置后5秒刷新 · 手动立即刷新
-    </div>
+    <div class="footer-note">🧪 模拟测试中 · 自动刷新周期20秒 · 保质期检查每0.5秒 · 到期LED+蜂鸣器同时响5秒</div>
 </div>
 
-<div id="toastMessage">提示消息</div>
+<!-- 报警弹窗 -->
+<div id="alertOverlay" class="alert-overlay" style="display:none;">
+    <div class="alert-dialog">
+        <div class="alert-icon">🚨</div>
+        <h3>⚠️ 食物保质期到期提醒</h3>
+        <p style="text-align:center;color:#6b7280;">以下食物已过期，请及时处理：</p>
+        <ul class="alert-list" id="alertFoodList"></ul>
+        <button class="alert-close-btn" id="alertCloseBtn"><i class="fas fa-check-circle"></i> 我知道了</button>
+    </div>
+</div>
+<div id="toastMessage"></div>
 
 <script>
 (function() {
-    // ---------- 新设备配置 ----------
+    // ========== 测试模拟开关 ==========
+    const TEST_MODE = true;   // true: 1天=2秒模拟测试; false: 正常时间
+
     const PRODUCT_ID = 'TAC1pGsMiv';
     const DEVICE_NAME = 'FRidge26';
-    
-    // 标识符 (与冰箱平台一致)
     const IDS = {
-        TEMP: 'temperature_data',
-        HUMI: 'humidity_data',
-        WEIGHT: 'light_intensity_value',    // 重量 kg
-        LED: 'led',
-        BUZZER: 'buzzer',
-        CARD: 'rfid_card_id'
+        TEMP: 'temperature_data', HUMI: 'humidity_data', WEIGHT: 'light_intensity_value',
+        LED: 'led', BUZZER: 'buzzer', CARD: 'rfid_card_id'
     };
+    const STORAGE_KEY = 'FRidge26_food_records';
 
     // DOM 元素
-    const tempSpan = document.getElementById('tempValue');
-    const humiSpan = document.getElementById('humiValue');
-    const weightSpan = document.getElementById('weightValue');
-    const ledCardSpan = document.getElementById('ledCardStatus');
-    const buzzerCardSpan = document.getElementById('buzzerCardStatus');
-    const assetCardSpan = document.getElementById('assetCardValue');
-    const currentCardHint = document.getElementById('currentCardIdHint');
-    const currentWeightHint = document.getElementById('currentWeightHint');
+    const tempSpan = document.getElementById('tempValue'), humiSpan = document.getElementById('humiValue'),
+          weightSpan = document.getElementById('weightValue'), ledCardSpan = document.getElementById('ledCardStatus'),
+          buzzerCardSpan = document.getElementById('buzzerCardStatus'), assetCardSpan = document.getElementById('assetCardValue'),
+          currentCardHint = document.getElementById('currentCardIdHint'), currentWeightHint = document.getElementById('currentWeightHint');
+    const tempUpdate = document.getElementById('tempUpdate'), humiUpdate = document.getElementById('humiUpdate'),
+          weightUpdate = document.getElementById('weightUpdate'), ledCardUpdate = document.getElementById('ledCardUpdate'),
+          buzzerCardUpdate = document.getElementById('buzzerCardUpdate'), assetCardUpdate = document.getElementById('assetCardUpdate');
+    const ledDevice = document.getElementById('ledDevice'), buzzerDevice = document.getElementById('buzzerDevice'),
+          ledStateText = document.getElementById('ledStateText'), buzzerStateText = document.getElementById('buzzerStateText');
+    const foodNameInput = document.getElementById('foodNameInput'), weightInput = document.getElementById('weightInput'),
+          shelfLifeInput = document.getElementById('shelfLifeInput'), setWeightBtn = document.getElementById('setWeightBtn'),
+          manualRefreshBtn = document.getElementById('manualRefreshBtn');
+    const btnTemp = document.getElementById('btnTemp'), btnHumi = document.getElementById('btnHumi'), btnWeight = document.getElementById('btnWeight');
+    const chartDom = document.getElementById('historyChart'), myChart = echarts.init(chartDom);
+    const assetTbody = document.getElementById('assetTableBody'), toastEl = document.getElementById('toastMessage');
+    const alertOverlay = document.getElementById('alertOverlay'), alertFoodList = document.getElementById('alertFoodList'),
+          alertCloseBtn = document.getElementById('alertCloseBtn');
 
-    const tempUpdate = document.getElementById('tempUpdate');
-    const humiUpdate = document.getElementById('humiUpdate');
-    const weightUpdate = document.getElementById('weightUpdate');
-    const ledCardUpdate = document.getElementById('ledCardUpdate');
-    const buzzerCardUpdate = document.getElementById('buzzerCardUpdate');
-    const assetCardUpdate = document.getElementById('assetCardUpdate');
-
-    const ledDevice = document.getElementById('ledDevice');
-    const buzzerDevice = document.getElementById('buzzerDevice');
-    const ledStateText = document.getElementById('ledStateText');
-    const buzzerStateText = document.getElementById('buzzerStateText');
-
-    const weightInput = document.getElementById('weightInput');
-    const setWeightBtn = document.getElementById('setWeightBtn');
-    const manualRefreshBtn = document.getElementById('manualRefreshBtn');
-
-    const btnTemp = document.getElementById('btnTemp');
-    const btnHumi = document.getElementById('btnHumi');
-    const btnWeight = document.getElementById('btnWeight');
-    const chartDom = document.getElementById('historyChart');
-    const myChart = echarts.init(chartDom);
-    const assetTbody = document.getElementById('assetTableBody');
-    const toastEl = document.getElementById('toastMessage');
-
-    // 授权头 (沿用原格式)
     const AUTH_HEADER = 'version=2022-05-01&res=userid%2F359160&et=2132849584&method=sha1&sign=qdEGK8coKGtMoUW7JQ5RyYcuCs4%3D';
     const REFRESH_INTERVAL = 20000;
+    const EXPIRY_CHECK_INTERVAL = TEST_MODE ? 500 : 30000;
 
-    // 状态
-    let ledOn = false, buzzerOn = false;
-    let isProcessing = false;
-    let isManualRefreshing = false;
-    let refreshTimer = null;
+    let ledOn = false, buzzerOn = false, isProcessing = false, isManualRefreshing = false;
+    let refreshTimer = null, isAlertFlashing = false;  // 统一报警标志（LED+蜂鸣器）
 
-    // 图表配置 (温度/湿度/重量)
     const chartSensors = [
         { name: '温度', unit: '°C', id: IDS.TEMP, digits: 1, color: '#f97316' },
         { name: '湿度', unit: '%RH', id: IDS.HUMI, digits: 1, color: '#3b82f6' },
         { name: '重量', unit: 'kg', id: IDS.WEIGHT, digits: 0, color: '#10b981' }
     ];
     let currentChartIndex = 0;
+    const historyStore = { [IDS.TEMP]: [], [IDS.HUMI]: [], [IDS.WEIGHT]: [], [IDS.CARD]: [] };
 
-    // 历史存储
-    const historyStore = {
-        [IDS.TEMP]: [],
-        [IDS.HUMI]: [],
-        [IDS.WEIGHT]: [],
-        [IDS.CARD]: []
-    };
+    // 本地存储操作
+    function loadLocalRecords() {
+        try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
+    }
+    function saveLocalRecords(records) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch(e){ showMessage('存储空间不足'); } }
+    function addLocalRecord(foodName, weight, cardId, shelfLifeDays) {
+        const records = loadLocalRecords();
+        const now = Date.now();
+        const expiryMs = TEST_MODE ? shelfLifeDays * 2000 : shelfLifeDays * 24 * 60 * 60 * 1000;
+        const newRecord = {
+            id: Date.now().toString() + Math.random().toString(36).substring(2,6),
+            time: new Date().toISOString(), foodName: foodName.trim(), weight, cardId,
+            shelfLifeDays, expiryTime: new Date(now + expiryMs).toISOString(), alerted: false
+        };
+        records.push(newRecord);
+        while (records.length > 200) records.shift();
+        saveLocalRecords(records);
+        return newRecord;
+    }
+    function markRecordsAsAlerted(ids) {
+        const records = loadLocalRecords(); let changed = false;
+        records.forEach(r => { if (ids.includes(r.id) && !r.alerted) { r.alerted = true; changed = true; } });
+        if (changed) saveLocalRecords(records);
+    }
 
-    // 辅助函数
     function showMessage(text, duration = 2500) {
-        toastEl.textContent = text;
-        toastEl.classList.add('show');
-        setTimeout(() => toastEl.classList.remove('show'), duration);
+        toastEl.textContent = text; toastEl.classList.add('show');
+        clearTimeout(toastEl._timeout); toastEl._timeout = setTimeout(() => toastEl.classList.remove('show'), duration);
     }
-
     function updateTimestamps() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        [tempUpdate, humiUpdate, weightUpdate, ledCardUpdate, buzzerCardUpdate, assetCardUpdate].forEach(el => {
-            el.innerHTML = `<i class="far fa-clock"></i> 更新时间：${timeStr}`;
-        });
+        const t = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        [tempUpdate, humiUpdate, weightUpdate, ledCardUpdate, buzzerCardUpdate, assetCardUpdate].forEach(el => el.innerHTML = `<i class="far fa-clock"></i> 更新时间：${t}`);
     }
-
     function updateLedUI() {
-        const stateText = ledOn ? '打开' : '关闭';
-        ledStateText.innerText = stateText;
-        ledStateText.className = 'device-state' + (ledOn ? ' on' : '');
-        ledCardSpan.textContent = stateText;
-        ledCardSpan.className = ledOn ? 'status-badge on' : 'status-badge';
+        const state = ledOn ? '打开' : '关闭'; ledStateText.innerText = state; ledStateText.className = 'device-state' + (ledOn?' on':'');
+        ledCardSpan.textContent = state; ledCardSpan.className = ledOn ? 'status-badge on' : 'status-badge';
     }
     function updateBuzzerUI() {
-        const stateText = buzzerOn ? '打开' : '关闭';
-        buzzerStateText.innerText = stateText;
-        buzzerStateText.className = 'device-state' + (buzzerOn ? ' on' : '');
-        buzzerCardSpan.textContent = stateText;
-        buzzerCardSpan.className = buzzerOn ? 'status-badge on' : 'status-badge';
+        const state = buzzerOn ? '打开' : '关闭'; buzzerStateText.innerText = state; buzzerStateText.className = 'device-state' + (buzzerOn?' on':'');
+        buzzerCardSpan.textContent = state; buzzerCardSpan.className = buzzerOn ? 'status-badge on' : 'status-badge';
     }
 
-    // 通用历史获取
-    async function fetchHistoryForIdentifier(identifier) {
-        const now = Date.now();
-        const fiveHoursAgo = now - 5 * 60 * 60 * 1000;
-        const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property-history';
-        const params = {
-            product_id: PRODUCT_ID,
-            device_name: DEVICE_NAME,
-            identifier: identifier,
-            start_time: fiveHoursAgo.toString(),
-            end_time: now.toString()
-        };
-        const requestUrl = `${url}?${new URLSearchParams(params).toString()}`;
+    // API调用
+    async function fetchHistoryForIdentifier(id) {
+        const now = Date.now(), fiveH = now - 5*3600000;
+        const url = `https://iot-api.heclouds.com/thingmodel/query-device-property-history?product_id=${PRODUCT_ID}&device_name=${DEVICE_NAME}&identifier=${id}&start_time=${fiveH}&end_time=${now}`;
         try {
-            const resp = await fetch(requestUrl, { headers: { 'Accept': 'application/json', 'authorization': AUTH_HEADER } });
-            const result = await resp.json();
-            if (result.code === 0 && result.data && Array.isArray(result.data.list)) {
-                return result.data.list.map(item => ({ time: item.time, value: item.value }));
-            }
-            return [];
-        } catch (e) { console.warn(`历史[${identifier}]失败`, e); return []; }
+            const r = await fetch(url, {headers:{'authorization':AUTH_HEADER}}); const d = await r.json();
+            return (d.code===0 && d.data?.list) ? d.data.list.map(i=>({time:i.time, value:i.value})) : [];
+        } catch(e){ return []; }
     }
-
-    // 设置期望值 (多属性)
     async function setMultipleDesired(paramsObj) {
         const url = 'https://iot-api.heclouds.com/thingmodel/set-device-desired-property';
-        const body = {
-            product_id: PRODUCT_ID,
-            device_name: DEVICE_NAME,
-            params: paramsObj
-        };
         try {
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'authorization': AUTH_HEADER },
-                body: JSON.stringify(body)
-            });
-            const result = await resp.json();
-            return result.code === 0;
-        } catch (e) { console.warn('设置期望值失败', e); return false; }
+            const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','authorization':AUTH_HEADER}, body:JSON.stringify({product_id:PRODUCT_ID, device_name:DEVICE_NAME, params:paramsObj})});
+            return (await r.json()).code === 0;
+        } catch(e){ return false; }
     }
-
-    async function setDeviceDesired(identifier, value) {
-        return setMultipleDesired({ [identifier]: value });
-    }
-
-    // 实时数据拉取
+    async function setDeviceDesired(identifier, value) { return setMultipleDesired({[identifier]: value}); }
     async function fetchRealtimeData() {
-        const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property';
-        const params = { product_id: PRODUCT_ID, device_name: DEVICE_NAME };
-        const requestUrl = `${url}?${new URLSearchParams(params).toString()}`;
+        const url = `https://iot-api.heclouds.com/thingmodel/query-device-property?product_id=${PRODUCT_ID}&device_name=${DEVICE_NAME}`;
         try {
-            const resp = await fetch(requestUrl, { headers: { 'Accept': 'application/json', 'authorization': AUTH_HEADER } });
-            const result = await resp.json();
-            if (result.code === 0 && Array.isArray(result.data)) {
-                const map = {};
-                result.data.forEach(item => { map[item.identifier] = item; });
-
-                // 温度
-                if (map[IDS.TEMP]?.value !== undefined) tempSpan.textContent = parseFloat(map[IDS.TEMP].value).toFixed(1);
-                // 湿度
-                if (map[IDS.HUMI]?.value !== undefined) humiSpan.textContent = parseInt(map[IDS.HUMI].value);
-                // 重量
-                if (map[IDS.WEIGHT]?.value !== undefined) {
-                    const w = parseInt(map[IDS.WEIGHT].value);
-                    weightSpan.textContent = w;
-                    currentWeightHint.textContent = w;
-                }
-                // 卡号
-                if (map[IDS.CARD]?.value !== undefined) {
-                    let cardVal = map[IDS.CARD].value;
-                    const cardStr = (cardVal !== undefined && cardVal !== null) ? cardVal.toString() : '--';
-                    assetCardSpan.textContent = cardStr;
-                    currentCardHint.textContent = cardStr;
-                }
-                // LED
-                if (map[IDS.LED]?.value !== undefined) {
-                    ledOn = (map[IDS.LED].value === 1 || map[IDS.LED].value === '1' || map[IDS.LED].value === true);
-                    updateLedUI();
-                }
-                // 蜂鸣器
-                if (map[IDS.BUZZER]?.value !== undefined) {
-                    buzzerOn = (map[IDS.BUZZER].value === 1 || map[IDS.BUZZER].value === '1' || map[IDS.BUZZER].value === true);
-                    updateBuzzerUI();
-                }
+            const r = await fetch(url, {headers:{'authorization':AUTH_HEADER}}); const d = await r.json();
+            if (d.code===0 && Array.isArray(d.data)) {
+                const map = {}; d.data.forEach(i=>map[i.identifier]=i);
+                if(map[IDS.TEMP]?.value!==undefined) tempSpan.textContent = parseFloat(map[IDS.TEMP].value).toFixed(1);
+                if(map[IDS.HUMI]?.value!==undefined) humiSpan.textContent = parseInt(map[IDS.HUMI].value);
+                if(map[IDS.WEIGHT]?.value!==undefined) { const w=parseInt(map[IDS.WEIGHT].value); weightSpan.textContent=w; currentWeightHint.textContent=w; }
+                if(map[IDS.CARD]?.value!==undefined) { const c=map[IDS.CARD].value; const cs=(c!==undefined&&c!==null)?c.toString():'--'; assetCardSpan.textContent=cs; currentCardHint.textContent=cs; }
+                // 报警期间不更新LED/蜂鸣器状态，避免覆盖报警效果
+                if(map[IDS.LED]?.value!==undefined && !isAlertFlashing) { ledOn = (map[IDS.LED].value==1||map[IDS.LED].value==='1'||map[IDS.LED].value===true); updateLedUI(); }
+                if(map[IDS.BUZZER]?.value!==undefined && !isAlertFlashing) { buzzerOn = (map[IDS.BUZZER].value==1||map[IDS.BUZZER].value==='1'||map[IDS.BUZZER].value===true); updateBuzzerUI(); }
             }
-        } catch (e) { console.warn('实时数据失败', e); }
+        } catch(e){}
     }
 
-    // 渲染图表
-    function renderChart() {
-        const sensor = chartSensors[currentChartIndex];
-        const records = historyStore[sensor.id] || [];
-        const sorted = [...records].sort((a, b) => a.time - b.time);
-        const times = sorted.map(r => new Date(r.time).toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' }));
-        const values = sorted.map(r => parseFloat(r.value));
-        const hasData = times.length > 0;
-        const option = {
-            backgroundColor: 'transparent',
-            tooltip: { trigger: 'axis' },
-            grid: { left: '10%', right: '8%', top: '18%', bottom: '12%' },
-            xAxis: { type: 'category', data: hasData ? times : ['无数据'], axisLabel: { fontSize: 9, rotate: 15 } },
-            yAxis: { type: 'value', name: `(${sensor.unit})` },
-            series: [{
-                data: hasData ? values : [0], type: 'line', smooth: true, symbol: 'circle', symbolSize: 6,
-                lineStyle: { width: 3, color: sensor.color }, areaStyle: { color: sensor.color + '20' }
-            }]
-        };
-        myChart.setOption(option, { replaceMerge: ['series'] });
-    }
+    // 🔔 LED + 蜂鸣器 联合报警（同时响5秒）
+    async function triggerAlert(durationMs = 5000) {
+        if (isAlertFlashing) return;
+        isAlertFlashing = true;
+        const prevLed = ledOn;
+        const prevBuzzer = buzzerOn;
+        try {
+            // 同时打开LED和蜂鸣器
+            await setMultipleDesired({ [IDS.LED]: 1, [IDS.BUZZER]: 1 });
+            ledOn = true; buzzerOn = true;
+            updateLedUI(); updateBuzzerUI();
 
-    function renderAssetTable() {
-        const weightRecords = historyStore[IDS.WEIGHT] || [];
-        const cardRecords = historyStore[IDS.CARD] || [];
-        const timeMap = new Map();
-        weightRecords.forEach(item => { if (!timeMap.has(item.time)) timeMap.set(item.time, { weight: null, card: null }); timeMap.get(item.time).weight = item.value; });
-        cardRecords.forEach(item => { if (!timeMap.has(item.time)) timeMap.set(item.time, { weight: null, card: null }); timeMap.get(item.time).card = item.value; });
-        const validTimes = Array.from(timeMap.keys()).filter(ts => timeMap.get(ts).weight !== null && timeMap.get(ts).card !== null).sort((a,b)=>b-a);
-        if (validTimes.length === 0) {
-            assetTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">暂无重量+卡号记录</td></tr>';
-            return;
+            // 持续5秒
+            await new Promise(r => setTimeout(r, durationMs));
+
+            // 恢复之前的状态
+            const restoreParams = {};
+            if (!prevLed) restoreParams[IDS.LED] = 0; else restoreParams[IDS.LED] = 1;
+            if (!prevBuzzer) restoreParams[IDS.BUZZER] = 0; else restoreParams[IDS.BUZZER] = 1;
+            await setMultipleDesired(restoreParams);
+            ledOn = prevLed; buzzerOn = prevBuzzer;
+            updateLedUI(); updateBuzzerUI();
+        } catch(e) {
+            console.warn('报警触发失败', e);
+            // 异常时也尝试恢复
+            ledOn = prevLed; buzzerOn = prevBuzzer;
+            updateLedUI(); updateBuzzerUI();
+        } finally {
+            isAlertFlashing = false;
         }
+    }
+
+    // 保质期检查与报警
+    function checkExpiryAndAlert() {
+        const records = loadLocalRecords(), now = Date.now();
+        const overdue = records.filter(r => !r.alerted && new Date(r.expiryTime).getTime() <= now);
+        if (!overdue.length) return;
+        markRecordsAsAlerted(overdue.map(r=>r.id));
+        showAlertDialog(overdue);
+        triggerAlert(5000);  // LED+蜂鸣器同时响5秒
+        renderAssetTable();
+    }
+    function showAlertDialog(overdueRecords) {
+        let html = ''; const now = Date.now();
+        overdueRecords.forEach(r => {
+            const diffMs = now - new Date(r.expiryTime).getTime();
+            const sec = Math.ceil(diffMs / 1000);
+            const tag = diffMs >= 0 ? `已过期 ${sec} 秒` : `即将到期`;
+            html += `<li>📦 <strong>${escapeHtml(r.foodName)}</strong> - 重量${r.weight}kg - 卡号${r.cardId} <span style="color:#dc2626;">${tag}</span></li>`;
+        });
+        alertFoodList.innerHTML = html; alertOverlay.style.display = 'flex'; document.body.style.overflow = 'hidden';
+    }
+    function hideAlertDialog() { alertOverlay.style.display = 'none'; document.body.style.overflow = ''; renderAssetTable(); }
+    function escapeHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    alertCloseBtn.addEventListener('click', hideAlertDialog);
+    alertOverlay.addEventListener('click', e => { if(e.target===alertOverlay) hideAlertDialog(); });
+
+    // 图表
+    function renderChart() {
+        const s = chartSensors[currentChartIndex], recs = historyStore[s.id] || [];
+        const sorted = [...recs].sort((a,b)=>a.time-b.time);
+        const times = sorted.map(r=>new Date(r.time).toLocaleTimeString('zh-CN',{hour12:false,hour:'2-digit',minute:'2-digit'}));
+        const vals = sorted.map(r=>parseFloat(r.value));
+        myChart.setOption({
+            tooltip:{trigger:'axis'}, grid:{left:'10%',right:'8%',top:'18%',bottom:'12%'},
+            xAxis:{type:'category',data:times.length?times:['无数据']},
+            yAxis:{type:'value',name:`(${s.unit})`},
+            series:[{data:vals.length?vals:[0],type:'line',smooth:true,lineStyle:{width:3,color:s.color},areaStyle:{color:s.color+'20'}}]
+        }, {replaceMerge:['series']});
+    }
+
+    // 表格渲染
+    function renderAssetTable() {
+        const records = loadLocalRecords();
+        if (!records.length) { assetTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">暂无食物记录</td></tr>'; return; }
+        const sorted = [...records].sort((a,b)=>new Date(b.time)-new Date(a.time));
+        const now = Date.now();
         let html = '';
-        validTimes.slice(0, 20).forEach(ts => {
-            const entry = timeMap.get(ts);
-            const timeStr = new Date(parseInt(ts)).toLocaleTimeString('zh-CN', { hour12: false });
-            html += `<tr><td>${timeStr}</td><td class="weight-value">${parseInt(entry.weight)} kg</td><td><span class="asset-card-id">${entry.card}</span></td></tr>`;
+        sorted.slice(0,50).forEach(r => {
+            const timeStr = new Date(r.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+            const expiry = new Date(r.expiryTime), diffMs = expiry.getTime() - now;
+            let statusHtml, statusClass;
+            if (diffMs <= 0) { statusHtml = `已过期 ${Math.ceil(-diffMs/1000)}秒`; statusClass = 'status-badge expired'; }
+            else if (diffMs <= 3000) { statusHtml = `即将到期 (${Math.ceil(diffMs/1000)}秒)`; statusClass = 'status-badge on'; }
+            else { statusHtml = `正常 (约${Math.ceil(diffMs/1000)}秒后)`; statusClass = 'status-badge'; }
+            html += `<tr>
+                <td>${timeStr}</td><td><span class="food-name-tag">🍎 ${escapeHtml(r.foodName)}</span></td>
+                <td class="weight-value">${r.weight} kg</td><td><span class="asset-card-id">${r.cardId}</span></td>
+                <td>${r.shelfLifeDays} 天</td><td>${expiry.toLocaleTimeString('zh-CN',{hour12:false})}</td>
+                <td><span class="${statusClass}">${statusHtml}</span></td></tr>`;
         });
         assetTbody.innerHTML = html;
     }
 
     // 核心刷新
     async function refreshAllData() {
-        const identifiers = [IDS.TEMP, IDS.HUMI, IDS.WEIGHT, IDS.CARD];
-        const promises = identifiers.map(id => fetchHistoryForIdentifier(id));
-        const results = await Promise.allSettled(promises);
-        results.forEach((res, idx) => { if (res.status === 'fulfilled') historyStore[identifiers[idx]] = res.value; });
-        renderChart();
-        renderAssetTable();
-        await fetchRealtimeData();
-        updateTimestamps();
+        const ids = [IDS.TEMP, IDS.HUMI, IDS.WEIGHT, IDS.CARD];
+        const results = await Promise.allSettled(ids.map(id=>fetchHistoryForIdentifier(id)));
+        results.forEach((r,i)=>{ if(r.status==='fulfilled') historyStore[ids[i]] = r.value; });
+        renderChart(); renderAssetTable(); await fetchRealtimeData(); updateTimestamps();
     }
 
-    // 设备点击
-    async function handleDeviceClick(deviceType) {
-        if (isProcessing) { showMessage('操作进行中，请稍后', 1200); return; }
-        let targetState, identifier, deviceName;
-        if (deviceType === 'led') { targetState = !ledOn; identifier = IDS.LED; deviceName = 'LED'; }
-        else if (deviceType === 'buzzer') { targetState = !buzzerOn; identifier = IDS.BUZZER; deviceName = '蜂鸣器'; }
-        else return;
-        const value = targetState ? 1 : 0;
-        isProcessing = true;
-        ledDevice.style.pointerEvents = 'none';
-        buzzerDevice.style.pointerEvents = 'none';
+    // 设备点击（报警期间禁止手动操作LED和蜂鸣器）
+    async function handleDeviceClick(type) {
+        if (isProcessing || isAlertFlashing) { showMessage(isAlertFlashing ? '报警进行中，请稍后操作' : '操作暂时不可用'); return; }
+        const isLed = type==='led'; const target = isLed ? !ledOn : !buzzerOn;
+        const id = isLed ? IDS.LED : IDS.BUZZER; const name = isLed ? 'LED' : '蜂鸣器';
+        isProcessing = true; ledDevice.style.pointerEvents='none'; buzzerDevice.style.pointerEvents='none';
         try {
-            const success = await setDeviceDesired(identifier, value);
-            if (success) {
-                if (deviceType === 'led') { ledOn = targetState; updateLedUI(); }
-                else { buzzerOn = targetState; updateBuzzerUI(); }
-                showMessage(`${deviceName} ${targetState ? '打开' : '关闭'}成功，5秒后刷新`, 2000);
-                if (refreshTimer) clearTimeout(refreshTimer);
-                refreshTimer = setTimeout(() => { refreshAllData(); refreshTimer = null; }, 5000);
-            } else { showMessage(`${deviceName}操作失败`, 2000); }
-        } catch(e) { showMessage('网络异常', 2000); }
-        finally { isProcessing = false; ledDevice.style.pointerEvents = ''; buzzerDevice.style.pointerEvents = ''; }
+            if (await setDeviceDesired(id, target?1:0)) {
+                if (isLed) { ledOn = target; updateLedUI(); } else { buzzerOn = target; updateBuzzerUI(); }
+                showMessage(`${name} ${target?'打开':'关闭'}成功，5秒后刷新`);
+                clearTimeout(refreshTimer); refreshTimer = setTimeout(()=>{refreshAllData(); refreshTimer=null;}, 5000);
+            } else showMessage('操作失败');
+        } catch(e){ showMessage('网络异常'); }
+        finally { isProcessing=false; ledDevice.style.pointerEvents=''; buzzerDevice.style.pointerEvents=''; }
     }
 
-    // 设置重量 (同时发送卡号)
+    // 录入食物
     async function handleSetWeight() {
-        let raw = weightInput.value.trim();
-        if (raw === '') { showMessage('请输入重量值', 1500); return; }
-        let weightNum = parseInt(raw, 10);
-        if (isNaN(weightNum) || weightNum < 0 || weightNum > 6000) { showMessage('重量需为0-6000整数', 1500); return; }
-
-        let cardStr = currentCardHint.textContent;
-        if (!cardStr || cardStr === '--') { showMessage('当前卡号无效，请稍后', 2000); return; }
-        let cardInt = parseInt(cardStr, 10);
-        if (isNaN(cardInt)) { showMessage('卡号格式错误', 2000); return; }
-
-        if (isProcessing) { showMessage('操作进行中', 1200); return; }
-        isProcessing = true;
-        setWeightBtn.disabled = true;
+        const food = foodNameInput.value.trim(); if(!food){showMessage('请输入食物名称');foodNameInput.focus();return;}
+        const wRaw = weightInput.value.trim(); if(!wRaw){showMessage('请输入重量');weightInput.focus();return;}
+        const w = parseInt(wRaw); if(isNaN(w)||w<0||w>6000){showMessage('重量需0-6000整数');return;}
+        const sRaw = shelfLifeInput.value.trim(); if(!sRaw){showMessage('请输入保质期天数');shelfLifeInput.focus();return;}
+        const days = parseInt(sRaw); if(isNaN(days)||days<1||days>365){showMessage('保质期需1-365天');return;}
+        let card = currentCardHint.textContent; let cardInt = 0;
+        if(card && card!=='--') { const p=parseInt(card); if(!isNaN(p)) cardInt = p; else showMessage('卡号格式异常，使用0'); }
+        if(isProcessing){showMessage('操作进行中');return;}
+        isProcessing=true; setWeightBtn.disabled=true;
         try {
-            const success = await setMultipleDesired({
-                [IDS.WEIGHT]: weightNum,
-                [IDS.CARD]: cardInt
-            });
-            if (success) {
-                showMessage(`重量设为 ${weightNum} kg，卡号 ${cardInt} 已同步，5秒后刷新`, 2500);
-                if (refreshTimer) clearTimeout(refreshTimer);
-                refreshTimer = setTimeout(() => { refreshAllData(); refreshTimer = null; }, 5000);
-            } else { showMessage('设置失败，请重试', 2000); }
-        } catch(e) { showMessage('网络错误', 2000); }
-        finally { isProcessing = false; setWeightBtn.disabled = false; }
+            if (await setMultipleDesired({[IDS.WEIGHT]:w, [IDS.CARD]:cardInt})) {
+                addLocalRecord(food, w, cardInt, days);
+                showMessage(`✅ ${food} 已录入 (${w}kg, ${days}天)`, 2500);
+                foodNameInput.value=''; weightInput.value=''; shelfLifeInput.value='';
+                renderAssetTable();
+                clearTimeout(refreshTimer); refreshTimer = setTimeout(()=>{refreshAllData();}, 5000);
+            } else showMessage('平台设置失败');
+        } catch(e){ showMessage('网络错误'); }
+        finally { isProcessing=false; setWeightBtn.disabled=false; }
     }
 
     async function handleManualRefresh() {
-        if (isManualRefreshing) { showMessage('刷新中...', 1000); return; }
-        isManualRefreshing = true;
-        manualRefreshBtn.disabled = true;
-        showMessage('正在刷新数据', 1000);
-        try {
-            await refreshAllData();
-            showMessage('刷新成功', 1500);
-        } catch (e) { showMessage('刷新失败', 1500); }
-        finally { isManualRefreshing = false; manualRefreshBtn.disabled = false; }
+        if(isManualRefreshing) return; isManualRefreshing=true; manualRefreshBtn.disabled=true;
+        showMessage('刷新中…',1000); try{await refreshAllData();showMessage('刷新成功');}catch(e){showMessage('刷新失败');}
+        finally{isManualRefreshing=false;manualRefreshBtn.disabled=false;}
     }
 
     // 图表切换
-    function setActiveChartButton(index) {
-        [btnTemp, btnHumi, btnWeight].forEach((btn, i) => btn.classList.toggle('active', i === index));
-    }
-    function switchChart(index) {
-        if (currentChartIndex === index) return;
-        currentChartIndex = index;
-        setActiveChartButton(index);
-        renderChart();
-    }
+    function switchChart(i) { if(currentChartIndex===i)return; currentChartIndex=i; [btnTemp,btnHumi,btnWeight].forEach((b,j)=>b.classList.toggle('active',j===i)); renderChart(); }
 
-    // 绑定事件
-    ledDevice.addEventListener('click', () => handleDeviceClick('led'));
-    buzzerDevice.addEventListener('click', () => handleDeviceClick('buzzer'));
+    // 事件绑定
+    ledDevice.addEventListener('click', ()=>handleDeviceClick('led'));
+    buzzerDevice.addEventListener('click', ()=>handleDeviceClick('buzzer'));
     setWeightBtn.addEventListener('click', handleSetWeight);
     manualRefreshBtn.addEventListener('click', handleManualRefresh);
-    btnTemp.addEventListener('click', () => switchChart(0));
-    btnHumi.addEventListener('click', () => switchChart(1));
-    btnWeight.addEventListener('click', () => switchChart(2));
-    window.addEventListener('resize', () => myChart.resize());
+    btnTemp.addEventListener('click', ()=>switchChart(0));
+    btnHumi.addEventListener('click', ()=>switchChart(1));
+    btnWeight.addEventListener('click', ()=>switchChart(2));
+    window.addEventListener('resize', ()=>myChart.resize());
+    foodNameInput.addEventListener('keydown', e=>{if(e.key==='Enter')shelfLifeInput.focus();});
+    weightInput.addEventListener('keydown', e=>{if(e.key==='Enter')handleSetWeight();});
+    shelfLifeInput.addEventListener('keydown', e=>{if(e.key==='Enter')handleSetWeight();});
 
     // 初始化
     refreshAllData();
     setInterval(refreshAllData, REFRESH_INTERVAL);
-    updateLedUI();
-    updateBuzzerUI();
-    setActiveChartButton(0);
+    setInterval(checkExpiryAndAlert, EXPIRY_CHECK_INTERVAL);
+    setTimeout(checkExpiryAndAlert, TEST_MODE ? 1000 : 5000);
+    updateLedUI(); updateBuzzerUI(); switchChart(0); renderAssetTable();
 })();
 </script>
 </body>
