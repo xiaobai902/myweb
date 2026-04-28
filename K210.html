@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>智能安防监测 · 环境与姿态感知</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4fa;
+            min-height: 100vh;
+            padding: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dashboard {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(25,60,100,0.3);
+            padding: 1.5rem 1.2rem 2rem;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #0f2b4f;
+            border-left: 6px solid #2b6ef0;
+            padding-left: 1rem;
+        }
+        h1 i { background: #fff; border-radius: 2rem; padding: 0.4rem; color: #2b6ef0; box-shadow: 0 4px 8px rgba(0,80,160,0.15); }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+        @media (min-width:500px) { .cards-grid { grid-template-columns: repeat(3,1fr); } }
+        @media (min-width:800px) { .cards-grid { grid-template-columns: repeat(6,1fr); } }
+        .sensor-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1rem 0.8rem 0.8rem;
+            box-shadow: 0 8px 18px -8px rgba(20,50,80,0.2);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .sensor-card:active { transform: scale(0.98); }
+        .card-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #4b6382;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-label i { font-size: 0.9rem; color: #3b82f6; }
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #123256;
+            word-break: break-word;
+            margin-bottom: 0.2rem;
+        }
+        .card-unit { font-size: 0.8rem; color: #627b9b; font-weight: 500; margin-left: 0.1rem; }
+        .update-tag {
+            font-size: 0.65rem;
+            color: #7a8faa;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            margin-top: 0.3rem;
+            border-top: 1px dashed #d0dfef;
+            padding-top: 0.4rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #dff0dd;
+            color: #1b6e3b;
+            white-space: nowrap;
+        }
+        .status-badge.danger { background: #ffdede; color: #b41818; }
+        .refresh-btn {
+            background: #4b7b9d;
+            border: none;
+            color: white;
+            padding: 0.65rem 1.4rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .refresh-btn:hover { background: #2c5a7a; transform: scale(0.98); }
+        .refresh-btn:active { transform: scale(0.96); }
+        .refresh-btn:disabled { background: #a0b8d0; cursor: not-allowed; transform: none; }
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+            gap: 0.6rem;
+        }
+        .history-header h2 {
+            font-size: 1.4rem;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #0f2b4f;
+            border-left: 5px solid #2b6ef0;
+            padding-left: 0.9rem;
+            margin: 0;
+        }
+        .chart-controls { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .chart-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #1f4973;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .chart-btn.active { background: #2b6ef0; color: white; border-color: #2b6ef0; font-weight: 600; }
+        .chart-btn:hover:not(.active) { background: #e0edff; border-color: #a8c8ff; }
+        .chart-wrapper {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 1.8rem;
+            padding: 1rem 0.5rem 0.5rem;
+            border: 1px solid rgba(255,255,255,0.9);
+            margin-bottom: 1rem;
+        }
+        #historyChart { width: 100%; height: 260px; }
+        .footer-note { margin-top: 1.2rem; font-size: 0.7rem; color: #7e96b2; text-align: right; }
+        #toastMessage {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #1f3a5f;
+            color: #fff;
+            text-align: center;
+            border-radius: 40px;
+            padding: 12px 20px;
+            position: fixed;
+            z-index: 999;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,20,50,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.2s;
+            opacity: 0;
+        }
+        #toastMessage.show { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="header-row">
+        <h1><i class="fas fa-shield-halved"></i> 智能安防 · 环境与姿态监测</h1>
+        <button class="refresh-btn" id="manualRefreshBtn"><i class="fas fa-sync-alt"></i> 立即刷新</button>
+    </div>
+
+    <!-- 传感器卡片 -->
+    <div class="cards-grid">
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-temperature-high"></i>温度</div>
+            <div class="card-value"><span id="tempValue">--</span><span class="card-unit">°C</span></div>
+            <div class="update-tag" id="tempUpdate"><i class="far fa-clock"></i> --:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-tint"></i>湿度</div>
+            <div class="card-value"><span id="humiValue">--</span><span class="card-unit">%RH</span></div>
+            <div class="update-tag" id="humiUpdate"><i class="far fa-clock"></i> --:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-volume-high"></i>噪音</div>
+            <div class="card-value"><span id="dbValue">--</span><span class="card-unit">dB</span></div>
+            <div class="update-tag" id="dbUpdate"><i class="far fa-clock"></i> --:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-camera"></i>人脸检测</div>
+            <div class="card-value"><span id="faceText" class="status-badge">--</span></div>
+            <div class="update-tag" id="faceUpdate"><i class="far fa-clock"></i> --:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-arrows-up-down"></i>Pitch</div>
+            <div class="card-value"><span id="pitchValue">--</span><span class="card-unit">rad</span></div>
+            <div class="update-tag" id="pitchUpdate"><i class="far fa-clock"></i> --:--:--</div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-arrows-rotate"></i>Roll</div>
+            <div class="card-value"><span id="rollValue">--</span><span class="card-unit">rad</span></div>
+            <div class="update-tag" id="rollUpdate"><i class="far fa-clock"></i> --:--:--</div>
+        </div>
+    </div>
+
+    <!-- 历史趋势 -->
+    <div class="history-header">
+        <h2><i class="fas fa-chart-line"></i> 历史数据分析 (5小时)</h2>
+        <div class="chart-controls">
+            <button class="chart-btn active" id="btnTemp">🌡️ 温度</button>
+            <button class="chart-btn" id="btnHumi">💧 湿度</button>
+            <button class="chart-btn" id="btnNoise">🔊 噪音</button>
+            <button class="chart-btn" id="btnPitch">📐 Pitch</button>
+            <button class="chart-btn" id="btnRoll">🔄 Roll</button>
+        </div>
+    </div>
+    <div class="chart-wrapper"><div id="historyChart"></div></div>
+    <div class="footer-note"><i class="fas fa-sync-alt"></i> 全局刷新周期20秒 · 手动刷新立即生效</div>
+</div>
+
+<div id="toastMessage">提示消息</div>
+
+<script>
+    (function() {
+        // ========== 配置信息 ==========
+        const PRODUCT_ID = '6C9u8D0f2e';
+        const DEVICE_NAME = 'Focus';
+        const AUTH = 'version=2022-05-01&res=userid%2F359160&et=2132849584&method=sha1&sign=qdEGK8coKGtMoUW7JQ5RyYcuCs4%3D';
+
+        // ========== DOM 元素 ==========
+        const tempSpan = document.getElementById('tempValue');
+        const humiSpan = document.getElementById('humiValue');
+        const dbSpan = document.getElementById('dbValue');
+        const faceSpan = document.getElementById('faceText');
+        const pitchSpan = document.getElementById('pitchValue');
+        const rollSpan = document.getElementById('rollValue');
+        const tempUpdate = document.getElementById('tempUpdate');
+        const humiUpdate = document.getElementById('humiUpdate');
+        const dbUpdate = document.getElementById('dbUpdate');
+        const faceUpdate = document.getElementById('faceUpdate');
+        const pitchUpdate = document.getElementById('pitchUpdate');
+        const rollUpdate = document.getElementById('rollUpdate');
+        const manualRefreshBtn = document.getElementById('manualRefreshBtn');
+        const btnTemp = document.getElementById('btnTemp');
+        const btnHumi = document.getElementById('btnHumi');
+        const btnNoise = document.getElementById('btnNoise');
+        const btnPitch = document.getElementById('btnPitch');
+        const btnRoll = document.getElementById('btnRoll');
+        const chartButtons = [btnTemp, btnHumi, btnNoise, btnPitch, btnRoll];
+        const chartDom = document.getElementById('historyChart');
+        const myChart = echarts.init(chartDom);
+        const toastEl = document.getElementById('toastMessage');
+
+        // ========== 标识符 ==========
+        const IDS = {
+            TEMP: 'temperature_data',
+            HUMI: 'humidity_data',
+            NOISE: 'db_detected',
+            FACE: 'K210_detected',
+            PITCH: 'Pitch_detected',
+            ROLL: 'Roll_detected'
+        };
+
+        // 图表配置
+        const chartSensors = [
+            { name: '温度', unit: '°C', id: IDS.TEMP, digits: 1, color: '#ff8c42' },
+            { name: '湿度', unit: '%RH', id: IDS.HUMI, digits: 0, color: '#3b9eff' },
+            { name: '噪音', unit: 'dB', id: IDS.NOISE, digits: 1, color: '#f5a623' },
+            { name: 'Pitch', unit: 'rad', id: IDS.PITCH, digits: 1, color: '#4ade80' },
+            { name: 'Roll', unit: 'rad', id: IDS.ROLL, digits: 1, color: '#a78bfa' }
+        ];
+        let currentChartIndex = 0;
+
+        const historyStore = {
+            [IDS.TEMP]: [], [IDS.HUMI]: [], [IDS.NOISE]: [], [IDS.PITCH]: [], [IDS.ROLL]: []
+        };
+
+        let isManualRefreshing = false;
+
+        // ========== 工具函数 ==========
+        function showMessage(text, duration = 2500) {
+            toastEl.textContent = text;
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), duration);
+        }
+
+        function updateTimestamps() {
+            const timeStr = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            [tempUpdate, humiUpdate, dbUpdate, faceUpdate, pitchUpdate, rollUpdate].forEach(el => {
+                el.innerHTML = `<i class="far fa-clock"></i> ${timeStr}`;
+            });
+        }
+
+        // 人脸状态：1=检测到人脸（正常绿色），0=无人（危险红色）
+        function updateFaceDisplay(value) {
+            const isDetected = (value === true || value === 'true' || value === 1 || value === '1');
+            faceSpan.textContent = isDetected ? '检测到人脸' : '无人';
+            faceSpan.className = isDetected ? 'status-badge' : 'status-badge danger';
+        }
+
+        // ========== API 请求 ==========
+        async function fetchHistory(identifier) {
+            const now = Date.now();
+            const start = now - 5 * 60 * 60 * 1000;
+            const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property-history';
+            const params = { product_id: PRODUCT_ID, device_name: DEVICE_NAME, identifier, start_time: start.toString(), end_time: now.toString() };
+            try {
+                const resp = await fetch(`${url}?${new URLSearchParams(params)}`, { headers: { 'Accept': 'application/json', 'authorization': AUTH } });
+                const result = await resp.json();
+                if (result.code === 0 && result.data?.list) {
+                    return result.data.list.map(item => ({ time: item.time, value: item.value }));
+                }
+                return [];
+            } catch (e) { console.warn('历史查询失败', e); return []; }
+        }
+
+        async function fetchRealtime() {
+            const url = 'https://iot-api.heclouds.com/thingmodel/query-device-property';
+            const params = { product_id: PRODUCT_ID, device_name: DEVICE_NAME };
+            try {
+                const resp = await fetch(`${url}?${new URLSearchParams(params)}`, { headers: { 'Accept': 'application/json', 'authorization': AUTH } });
+                const result = await resp.json();
+                if (result.code === 0 && Array.isArray(result.data)) {
+                    const map = {};
+                    result.data.forEach(item => { map[item.identifier] = item; });
+                    if (map[IDS.TEMP]) tempSpan.textContent = parseFloat(map[IDS.TEMP].value).toFixed(1);
+                    if (map[IDS.HUMI]) humiSpan.textContent = parseInt(map[IDS.HUMI].value);
+                    if (map[IDS.NOISE]) dbSpan.textContent = parseFloat(map[IDS.NOISE].value).toFixed(1);
+                    if (map[IDS.FACE]) updateFaceDisplay(map[IDS.FACE].value);
+                    if (map[IDS.PITCH]) pitchSpan.textContent = parseFloat(map[IDS.PITCH].value).toFixed(1);
+                    if (map[IDS.ROLL]) rollSpan.textContent = parseFloat(map[IDS.ROLL].value).toFixed(1);
+                }
+            } catch (e) { console.warn('实时数据获取失败', e); }
+        }
+
+        // ========== 图表渲染 ==========
+        function renderChart() {
+            const sensor = chartSensors[currentChartIndex];
+            const records = [...(historyStore[sensor.id] || [])].sort((a,b) => a.time - b.time);
+            const times = records.map(r => new Date(r.time).toLocaleTimeString('zh-CN', { hour12:false, hour:'2-digit', minute:'2-digit' }));
+            const values = records.map(r => parseFloat(r.value));
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', formatter: (params) => `${params[0].name}<br/>${sensor.name}: ${parseFloat(params[0].value).toFixed(sensor.digits)} ${sensor.unit}` },
+                grid: { left: '10%', right: '8%', top: '18%', bottom: '12%' },
+                xAxis: { type: 'category', data: times.length ? times : ['无数据'], axisLabel: { fontSize:9, rotate:15 } },
+                yAxis: { type: 'value', name: `(${sensor.unit})` },
+                series: [{ data: times.length ? values : [0], type: 'line', smooth: true, symbol: 'circle', symbolSize:6, lineStyle:{ width:3, color:sensor.color }, areaStyle:{ color:sensor.color+'20' } }]
+            };
+            myChart.setOption(option, { replaceMerge: ['series'] });
+        }
+
+        // ========== 全局刷新 ==========
+        async function refreshAll() {
+            const ids = [IDS.TEMP, IDS.HUMI, IDS.NOISE, IDS.PITCH, IDS.ROLL];
+            const results = await Promise.allSettled(ids.map(id => fetchHistory(id)));
+            results.forEach((res, i) => { if (res.status === 'fulfilled') historyStore[ids[i]] = res.value; });
+            renderChart();
+            await fetchRealtime();
+            updateTimestamps();
+        }
+
+        // ========== 手动刷新 ==========
+        async function manualRefresh() {
+            if (isManualRefreshing) { showMessage('刷新中…', 1500); return; }
+            isManualRefreshing = true;
+            manualRefreshBtn.disabled = true;
+            try { await refreshAll(); showMessage('刷新成功', 1500); } catch (e) { showMessage('刷新失败', 2000); }
+            finally { isManualRefreshing = false; manualRefreshBtn.disabled = false; }
+        }
+
+        // ========== 事件绑定 ==========
+        manualRefreshBtn.addEventListener('click', manualRefresh);
+        function switchChart(idx) {
+            if (currentChartIndex === idx) return;
+            currentChartIndex = idx;
+            chartButtons.forEach((b,i) => b.classList.toggle('active', i===idx));
+            renderChart();
+        }
+        btnTemp.addEventListener('click', () => switchChart(0));
+        btnHumi.addEventListener('click', () => switchChart(1));
+        btnNoise.addEventListener('click', () => switchChart(2));
+        btnPitch.addEventListener('click', () => switchChart(3));
+        btnRoll.addEventListener('click', () => switchChart(4));
+        window.addEventListener('resize', () => myChart.resize());
+
+        // ========== 启动 ==========
+        refreshAll();
+        setInterval(refreshAll, 20000);
+        chartButtons[0].classList.add('active');
+    })();
+</script>
+</body>
+</html>
