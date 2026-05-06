@@ -3,145 +3,760 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>冰箱 · 智能监测 FRidge26 (模拟测试)</title>
+    <title>冰箱 · 智能监测 FRidge26 (云端版)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js">
     </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* 全局重置与基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #dbeafe;
+            --primary-dark: #1d4ed8;
+            --success-color: #16a34a;
+            --success-light: #dcfce7;
+            --warning-color: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger-color: #dc2626;
+            --danger-light: #fee2e2;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius-sm: 0.5rem;
+            --border-radius-md: 1rem;
+            --border-radius-lg: 1.5rem;
+            --border-radius-xl: 2rem;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #e9f2f5; min-height: 100vh; padding: 0.8rem;
-            display: flex; align-items: center; justify-content: center;
+            background-color: var(--background);
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
         }
+
         .dashboard {
-            max-width: 1200px; width: 100%; background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(10px); border-radius: 2.2rem;
-            box-shadow: 0 20px 35px -10px rgba(15,65,95,0.25);
-            padding: 1.6rem 1.2rem 2rem; border: 1px solid rgba(255,255,255,0.9);
+            max-width: 1200px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            margin-top: 2rem;
         }
-        h1 { font-size: 1.9rem; font-weight: 650; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.8rem; color: #124066; border-left: 6px solid #2b6ef0; padding-left: 1.2rem; }
-        h1 i { background: white; border-radius: 2rem; padding: 0.4rem; color: #2b6ef0; box-shadow: 0 4px 8px rgba(0,80,160,0.15); }
-        .device-section h2, .asset-control-section h2 { font-size: 1.6rem; font-weight: 650; display: flex; align-items: center; gap: 0.6rem; color: #124066; border-left: 6px solid #2b6ef0; padding-left: 1rem; margin-bottom: 1.2rem; }
-        .cards-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.8rem; }
-        @media (min-width:500px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
-        @media (min-width:800px){.cards-grid{grid-template-columns:repeat(6,1fr)}}
-        .sensor-card { background: white; border-radius: 1.5rem; padding: 1rem 0.8rem; box-shadow: 0 8px 18px -8px rgba(15,60,90,0.15); transition: 0.2s; display: flex; flex-direction: column; }
-        .sensor-card:active{transform:scale(0.98)}
-        .card-label{font-size:0.7rem;font-weight:600;color:#3a6282;display:flex;align-items:center;gap:0.2rem;margin-bottom:0.5rem}
-        .card-label i{font-size:0.9rem;color:#2b6ef0}
-        .card-value{font-size:1.8rem;font-weight:700;color:#103450;margin-bottom:0.2rem}
-        .card-unit{font-size:0.8rem;color:#56759b;font-weight:500;margin-left:0.1rem}
-        .update-tag{font-size:0.65rem;color:#6882a0;display:flex;align-items:center;gap:0.2rem;margin-top:0.3rem;border-top:1px dashed #bcd0e6;padding-top:0.4rem}
-        .status-badge{display:inline-block;padding:0.3rem 1rem;border-radius:30px;font-size:0.9rem;font-weight:600;background:#e2f0e6;color:#1a6e4b}
-        .status-badge.on{background:#feeec8;color:#a86903}
-        .status-badge.expired{background:#ffe0e0;color:#b91c1c}
-        .device-section,.asset-control-section{background:rgba(255,255,255,0.5);backdrop-filter:blur(4px);border-radius:2rem;padding:1.2rem 1.4rem;margin:1.5rem 0;border:1px solid white;box-shadow:0 6px 14px rgba(25,70,110,0.08)}
-        .device-list{display:flex;flex-wrap:wrap;gap:0.9rem}
-        .device-item{background:white;border-radius:3rem;padding:0.8rem 1.5rem 0.8rem 1.2rem;display:inline-flex;align-items:center;gap:0.8rem;box-shadow:0 4px 8px rgba(0,40,70,0.08);flex:1 1 auto;min-width:150px;font-weight:550;color:#1b3a5e;transition:0.2s}
-        .device-item i{color:#2b6ef0;font-size:1.2rem;width:1.6rem}
-        .device-state{margin-left:auto;font-weight:600;padding:0.2rem 1.2rem;border-radius:30px;background:#eef3f9;color:#2b4f73}
-        .device-state.on{background:#faeec2;color:#8a5f00}
-        .clickable-device{cursor:pointer}
-        .clickable-device:hover{background:#e3efff;box-shadow:0 6px 12px rgba(0,60,120,0.12)}
-        .clickable-device:active{transform:scale(0.97);background:#d0e4ff}
-        .asset-control-panel{display:flex;flex-wrap:wrap;gap:0.8rem;margin-top:0.8rem;background:rgba(255,255,255,0.5);padding:1.2rem;border-radius:1.8rem;align-items:flex-end}
-        .asset-control-group{flex:1;min-width:120px}
-        .asset-control-group label{display:block;font-size:0.8rem;font-weight:600;color:#1f4770;margin-bottom:0.4rem}
-        .asset-control-group input{width:100%;padding:0.75rem 0.9rem;border:1px solid #bfd6e9;border-radius:2.5rem;font-size:0.9rem;outline:none;transition:0.2s;background:white}
-        .asset-control-group input:focus{border-color:#2b6ef0;box-shadow:0 0 0 3px rgba(43,110,240,0.2)}
-        .asset-set-btn{background:#2b6ef0;border:none;color:white;padding:0.75rem 1.4rem;border-radius:2.5rem;font-weight:600;font-size:0.9rem;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:0.5rem;white-space:nowrap;height:44px}
-        .asset-set-btn:hover{background:#1a57d4;transform:scale(0.98)}
-        .asset-set-btn:active{transform:scale(0.96)}
-        .asset-set-btn:disabled{background:#a0b8d0;cursor:not-allowed}
-        .refresh-btn{background:#386f9e}
-        .refresh-btn:hover{background:#1e4f77}
-        .current-asset-info{font-size:0.85rem;color:#2660a2;background:#e3f0fd;border-radius:2.5rem;padding:0.5rem 1.3rem;display:inline-flex;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-top:0.8rem}
-        .history-header{display:flex;align-items:center;justify-content:space-between;margin:1rem 0}
-        .chart-btn{background:white;border:1px solid #cbd5e1;border-radius:2rem;padding:0.4rem 1.3rem;font-size:0.9rem;font-weight:500;color:#1f4973;cursor:pointer;transition:0.2s}
-        .chart-btn.active{background:#2b6ef0;color:white;border-color:#2b6ef0}
-        .chart-wrapper{background:rgba(255,255,255,0.5);backdrop-filter:blur(4px);border-radius:1.8rem;padding:1rem 0.5rem 0.5rem;border:1px solid white;margin-bottom:1.8rem}
-        #historyChart{width:100%;height:250px}
-        .asset-table-section{background:rgba(255,255,255,0.5);backdrop-filter:blur(4px);border-radius:1.8rem;padding:1.2rem;border:1px solid white}
-        .asset-table-section h3{font-size:1.3rem;font-weight:650;color:#173457;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;border-left:4px solid #2b6ef0;padding-left:1rem}
-        .table-responsive{overflow-x:auto;border-radius:1rem;max-height:400px;overflow-y:auto}
-        table{width:100%;border-collapse:collapse;font-size:0.82rem;min-width:700px}
-        th{background:#d9e7f5;padding:0.75rem 0.4rem;font-weight:600;color:#103959;position:sticky;top:0}
-        td{padding:0.65rem 0.4rem;border-bottom:1px solid #c5d9ee;text-align:center}
-        td:first-child,th:first-child{text-align:left}
-        .weight-value{font-weight:600;color:#1c6b4a}
-        .asset-card-id{font-family:'Courier New',monospace;background:#e5effa;padding:0.1rem 0.6rem;border-radius:2rem}
-        .food-name-tag{font-weight:600;color:#1f3d5e;max-width:120px;overflow:hidden;text-overflow:ellipsis;display:inline-block}
-        .footer-note{margin-top:1.5rem;font-size:0.7rem;color:#6b8aaa;text-align:right}
-        #toastMessage{visibility:hidden;min-width:200px;background:#1a3c5e;color:white;text-align:center;border-radius:40px;padding:12px 22px;position:fixed;z-index:9999;bottom:30px;left:50%;transform:translateX(-50%);font-size:0.95rem;box-shadow:0 10px 25px rgba(0,20,50,0.4);opacity:0;transition:0.2s;pointer-events:none}
-        #toastMessage.show{visibility:visible;opacity:1}
-        .alert-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .alert-dialog{background:white;border-radius:1.8rem;padding:1.8rem 1.5rem;max-width:500px;width:90%;box-shadow:0 25px 50px rgba(0,0,0,0.35);border:3px solid #ef4444;animation:shakeIn 0.4s;max-height:80vh;overflow-y:auto}
-        @keyframes shakeIn{0%{transform:translateY(-30px);opacity:0}50%{transform:translateY(8px)}80%{transform:translateY(-3px)}100%{transform:translateY(0);opacity:1}}
-        .alert-dialog .alert-icon{font-size:3rem;text-align:center;color:#ef4444;margin-bottom:0.6rem;animation:pulse 1s infinite}
-        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-        .alert-dialog h3{font-size:1.4rem;color:#991b1b;text-align:center;margin-bottom:0.8rem}
-        .alert-list{background:#fef2f2;border-radius:1rem;padding:0.8rem 1rem;margin:0.8rem 0;list-style:none;max-height:200px;overflow-y:auto}
-        .alert-list li{padding:0.4rem 0;border-bottom:1px dashed #fca5a5;font-size:0.9rem;color:#7f1d1d}
-        .alert-list li:last-child{border-bottom:none}
-        .alert-close-btn{display:block;margin:1rem auto 0;background:#ef4444;color:white;border:none;padding:0.75rem 2.5rem;border-radius:2.5rem;font-weight:700;font-size:1rem;cursor:pointer;transition:0.2s}
-        .alert-close-btn:hover{background:#dc2626;transform:scale(0.96)}
-        .test-badge { background: #f59e0b; color: white; font-size: 0.75rem; padding: 0.2rem 0.8rem; border-radius: 2rem; margin-left: 0.5rem; }
+
+        /* 标题样式 */
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            border-left: 3px solid var(--primary-color);
+            padding-left: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        /* 卡片网格布局 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .sensor-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 1rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sensor-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-label i {
+            color: var(--primary-color);
+            font-size: 0.875rem;
+        }
+
+        .card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .card-unit {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-left: 0.25rem;
+        }
+
+        .update-tag {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: auto;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 0.5rem;
+        }
+
+        /* 状态徽章 */
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .status-badge.on {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+        }
+
+        .status-badge.expired {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .status-badge.pending {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        /* 设备控制区域 */
+        .device-section {
+            background-color: rgba(248, 250, 252, 0.8);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .device-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .device-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 0.75rem 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            flex: 1 1 auto;
+            min-width: 180px;
+            font-weight: 550;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .device-item i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .device-state {
+            margin-left: auto;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .device-state.on {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+        }
+
+        .clickable-device {
+            cursor: pointer;
+        }
+
+        .clickable-device:hover {
+            background-color: var(--primary-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .clickable-device:active {
+            transform: scale(0.98);
+        }
+
+        /* 资产控制区域 */
+        .asset-control-section {
+            background-color: rgba(248, 250, 252, 0.8);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .asset-control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-lg);
+            align-items: flex-end;
+        }
+
+        .asset-control-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .asset-control-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .asset-control-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: var(--card-bg);
+        }
+
+        .asset-control-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .asset-control-group input[readonly] {
+            background-color: #f8fafc;
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .asset-set-btn {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-lg);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .asset-set-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .asset-set-btn:active {
+            transform: translateY(0);
+        }
+
+        .asset-set-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .refresh-btn {
+            background-color: #0f766e;
+        }
+
+        .refresh-btn:hover {
+            background-color: #0d9488;
+        }
+
+        .current-asset-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            background-color: var(--primary-light);
+            border-radius: var(--border-radius-lg);
+            padding: 0.75rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* 历史趋势区域 */
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chart-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chart-btn:hover:not(.active) {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+        }
+
+        .chart-wrapper {
+            background-color: rgba(248, 250, 252, 0.8);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        #historyChart {
+            width: 100%;
+            height: 300px;
+        }
+
+        /* 表格区域 */
+        .asset-table-section {
+            background-color: rgba(248, 250, 252, 0.8);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: var(--border-radius-md);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            min-width: 600px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            padding: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .weight-value {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .asset-card-id {
+            font-family: 'Courier New', monospace;
+            background-color: var(--primary-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.8rem;
+        }
+
+        .food-name-tag {
+            font-weight: 600;
+            color: var(--text-primary);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        /* 页脚和其他元素 */
+        .footer-note {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .test-badge {
+            background-color: var(--warning-color);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+        }
+
+        /* 弹窗样式 */
+        #toastMessage {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: center;
+            border-radius: var(--border-radius-lg);
+            padding: 12px 22px;
+            position: fixed;
+            z-index: 9999;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        #toastMessage.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-dialog {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            border: 3px solid var(--danger-color);
+            animation: shakeIn 0.4s;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @keyframes shakeIn {
+            0% { transform: translateY(-30px); opacity: 0; }
+            50% { transform: translateY(8px); }
+            80% { transform: translateY(-3px); }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-dialog .alert-icon {
+            font-size: 3rem;
+            text-align: center;
+            color: var(--danger-color);
+            margin-bottom: 1rem;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .alert-dialog h3 {
+            font-size: 1.4rem;
+            color: var(--danger-color);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .alert-list {
+            background-color: var(--danger-light);
+            border-radius: var(--border-radius-md);
+            padding: 1rem;
+            margin: 1rem 0;
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .alert-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #fca5a5;
+            font-size: 0.95rem;
+            color: #7f1d1d;
+        }
+
+        .alert-list li:last-child {
+            border-bottom: none;
+        }
+
+        .alert-close-btn {
+            display: block;
+            margin: 1.5rem auto 0;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 2.5rem;
+            border-radius: var(--border-radius-lg);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-close-btn:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+        }
+
+        .alert-close-btn:active {
+            transform: translateY(0);
+        }
+
+        .history-dialog {
+            border-color: var(--primary-color);
+        }
+
+        .history-dialog .alert-icon,
+        .history-dialog h3 {
+            color: var(--primary-color);
+        }
+
+        .history-dialog .alert-list {
+            background-color: var(--primary-light);
+        }
+
+        .history-dialog .alert-list li {
+            border-bottom-color: #bfdbfe;
+            color: #1e3a8a;
+        }
+
+        .history-dialog .alert-close-btn {
+            background-color: var(--primary-color);
+        }
+
+        .history-dialog .alert-close-btn:hover {
+            background-color: var(--primary-dark);
+        }
     </style>
 </head>
 <body>
 <div class="dashboard">
-    <h1><i class="fas fa-temperature-low"></i> 冰箱 · 智能监测 FRidge26 <span class="test-badge">🧪 模拟测试</span></h1>
+    <h1 class="page-title"><i class="fas fa-temperature-low"></i> 冰箱 · 智能监测 FRidge26 <span class="test-badge">☁️ 云端存储</span></h1>
 
     <!-- 6个核心卡片 -->
     <div class="cards-grid">
-        <div class="sensor-card"><div class="card-label"><i class="fas fa-thermometer-half"></i> 温度</div><div class="card-value"><span id="tempValue">--</span><span class="card-unit">°C</span></div><div class="update-tag" id="tempUpdate"></div></div>
-        <div class="sensor-card"><div class="card-label"><i class="fas fa-tint"></i> 湿度</div><div class="card-value"><span id="humiValue">--</span><span class="card-unit">%</span></div><div class="update-tag" id="humiUpdate"></div></div>
-        <div class="sensor-card"><div class="card-label"><i class="fas fa-weight-hanging"></i> 重量</div><div class="card-value"><span id="weightValue">--</span><span class="card-unit">kg</span></div><div class="update-tag" id="weightUpdate"></div></div>
-        <div class="sensor-card"><div class="card-label"><i class="fas fa-lightbulb"></i> LED状态</div><div class="card-value"><span id="ledCardStatus" class="status-badge">--</span></div><div class="update-tag" id="ledCardUpdate"></div></div>
-        <div class="sensor-card"><div class="card-label"><i class="fas fa-bell"></i> 蜂鸣器</div><div class="card-value"><span id="buzzerCardStatus" class="status-badge">--</span></div><div class="update-tag" id="buzzerCardUpdate"></div></div>
-        <div class="sensor-card"><div class="card-label"><i class="fas fa-id-card"></i> 资产卡号</div><div class="card-value" style="font-size:1.2rem;" id="assetCardValue">--</div><div class="update-tag" id="assetCardUpdate"></div></div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-thermometer-half"></i> 温度</div>
+            <div class="card-value"><span id="tempValue">--</span><span class="card-unit">°C</span></div>
+            <div class="update-tag" id="tempUpdate"></div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-tint"></i> 湿度</div>
+            <div class="card-value"><span id="humiValue">--</span><span class="card-unit">%</span></div>
+            <div class="update-tag" id="humiUpdate"></div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-weight-hanging"></i> 重量</div>
+            <div class="card-value"><span id="weightValue">--</span><span class="card-unit">kg</span></div>
+            <div class="update-tag" id="weightUpdate"></div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-lightbulb"></i> LED状态</div>
+            <div class="card-value"><span id="ledCardStatus" class="status-badge">--</span></div>
+            <div class="update-tag" id="ledCardUpdate"></div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-bell"></i> 蜂鸣器</div>
+            <div class="card-value"><span id="buzzerCardStatus" class="status-badge">--</span></div>
+            <div class="update-tag" id="buzzerCardUpdate"></div>
+        </div>
+        <div class="sensor-card">
+            <div class="card-label"><i class="fas fa-id-card"></i> 资产卡号</div>
+            <div class="card-value" style="font-size:1.3rem;" id="assetCardValue">--</div>
+            <div class="update-tag" id="assetCardUpdate"></div>
+        </div>
     </div>
 
     <!-- 设备控制 -->
     <div class="device-section">
-        <h2><i class="fas fa-sliders-h"></i> 设备控制中心</h2>
+        <h2 class="section-title"><i class="fas fa-sliders-h"></i> 设备控制中心</h2>
         <div class="device-list">
-            <div class="device-item clickable-device" id="ledDevice"><i class="fas fa-lightbulb"></i> LED灯 <span class="device-state" id="ledStateText">关闭</span></div>
-            <div class="device-item clickable-device" id="buzzerDevice"><i class="fas fa-bell"></i> 蜂鸣器 <span class="device-state" id="buzzerStateText">关闭</span></div>
+            <div class="device-item clickable-device" id="ledDevice">
+                <i class="fas fa-lightbulb"></i> LED灯
+                <span class="device-state" id="ledStateText">关闭</span>
+            </div>
+            <div class="device-item clickable-device" id="buzzerDevice">
+                <i class="fas fa-bell"></i> 蜂鸣器
+                <span class="device-state" id="buzzerStateText">关闭</span>
+            </div>
         </div>
     </div>
 
     <!-- 食物录入 -->
     <div class="asset-control-section">
-        <h2><i class="fas fa-balance-scale"></i> 重量、卡号与食物管理</h2>
+        <h2 class="section-title"><i class="fas fa-balance-scale"></i> 食物名称与保质期管理 (自动绑定云端卡号)</h2>
         <div class="asset-control-panel">
-            <div class="asset-control-group"><label><i class="fas fa-apple-alt"></i> 食物名称</label><input type="text" id="foodNameInput" placeholder="例如：牛奶"></div>
-            <div class="asset-control-group"><label><i class="fas fa-weight-scale"></i> 设定重量 (kg)</label><input type="number" id="weightInput" step="1" min="0" max="6000" placeholder="125"></div>
-            <div class="asset-control-group"><label><i class="fas fa-calendar-alt"></i> 保质期 (天)</label><input type="number" id="shelfLifeInput" step="1" min="1" max="365" placeholder="7"></div>
-            <div class="asset-control-group" style="flex:0 0 auto;"><label>&nbsp;</label><button class="asset-set-btn" id="setWeightBtn"><i class="fas fa-save"></i> 录入食物</button></div>
-            <div class="asset-control-group" style="flex:0 0 auto;"><label>&nbsp;</label><button class="asset-set-btn refresh-btn" id="manualRefreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button></div>
+            <div class="asset-control-group">
+                <label><i class="fas fa-id-card"></i> 当前云端卡号</label>
+                <input type="text" id="cardIdInput" placeholder="自动同步云端卡号" readonly>
+            </div>
+            <div class="asset-control-group">
+                <label><i class="fas fa-apple-alt"></i> 食物名称</label>
+                <input type="text" id="foodNameInput" placeholder="例如：牛奶">
+            </div>
+            <div class="asset-control-group">
+                <label><i class="fas fa-calendar-alt"></i> 保质期 (天)</label>
+                <input type="number" id="shelfLifeInput" step="1" min="1" max="365" placeholder="7">
+            </div>
+            <div class="asset-control-group" style="flex: 0 0 auto;">
+                <label>&nbsp;</label>
+                <button class="asset-set-btn" id="setWeightBtn"><i class="fas fa-save"></i> 录入食物</button>
+            </div>
+            <div class="asset-control-group" style="flex: 0 0 auto;">
+                <label>&nbsp;</label>
+                <button class="asset-set-btn refresh-btn" id="manualRefreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button>
+            </div>
         </div>
         <div class="current-asset-info">
             <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> | 当前重量: <strong id="currentWeightHint">--</strong> kg
-            <span style="margin-left:0.6rem;">🧪 测试模式：1天=2秒</span>
+            <span style="margin-left: 0.6rem;">💾 食物名称和保质期保存在本地，卡号/重量自动同步云端</span>
         </div>
     </div>
 
     <!-- 趋势图 -->
-    <div class="history-header"><h2><i class="fas fa-chart-line"></i> 历史趋势</h2><div class="chart-controls"><button class="chart-btn active" id="btnTemp">🌡️ 温度</button><button class="chart-btn" id="btnHumi">💧 湿度</button><button class="chart-btn" id="btnWeight">⚖️ 重量</button></div></div>
-    <div class="chart-wrapper"><div id="historyChart"></div></div>
-
-    <!-- 历史记录表 -->
-    <div class="asset-table-section">
-        <h3><i class="fas fa-history"></i> 食物录入历史</h3>
-        <div class="table-responsive">
-            <table><thead><tr><th>录入时间</th><th>食物</th><th>重量</th><th>卡号</th><th>保质期(天)</th><th>到期时间</th><th>状态</th></tr></thead>
-            <tbody id="assetTableBody"></tbody></table>
+    <div class="history-header">
+        <h2 class="section-title"><i class="fas fa-chart-line"></i> 历史趋势</h2>
+        <div class="chart-controls">
+            <button class="chart-btn active" id="btnTemp">🌡️ 温度</button>
+            <button class="chart-btn" id="btnHumi">💧 湿度</button>
+            <button class="chart-btn" id="btnWeight">⚖️ 重量</button>
         </div>
     </div>
-    <div class="footer-note">🧪 模拟测试中 · 自动刷新周期20秒 · 保质期检查每0.5秒 · 到期LED+蜂鸣器同时响5秒</div>
+    <div class="chart-wrapper">
+        <div id="historyChart"></div>
+    </div>
+
+    <!-- 云端食物历史记录表 -->
+    <div class="asset-table-section">
+        <h3 class="section-title"><i class="fas fa-cloud"></i> 食物录入历史(云端+本地)</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>录入时间</th>
+                        <th>卡号</th>
+                        <th>食物</th>
+                        <th>重量</th>
+                        <th>保质期(天)</th>
+                        <th>到期时间</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="assetTableBody"><tr><td colspan="7" style="text-align:center;">加载历史数据中...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="footer-note">☁️ 云端自动存储 · 自动刷新周期20秒 · 保质期检查每0.5秒</div>
 </div>
 
 <!-- 报警弹窗 -->
@@ -154,20 +769,33 @@
         <button class="alert-close-btn" id="alertCloseBtn"><i class="fas fa-check-circle"></i> 我知道了</button>
     </div>
 </div>
+<div id="historyOverlay" class="alert-overlay" style="display:none;">
+    <div class="alert-dialog history-dialog">
+        <div class="alert-icon">🆕</div>
+        <h3>食物录入历史更新</h3>
+        <p style="text-align:center;color:#6b7280;">以下新增记录已同步到历史列表：</p>
+        <ul class="alert-list" id="historyFoodList"></ul>
+        <button class="alert-close-btn" id="historyCloseBtn"><i class="fas fa-check-circle"></i> 我知道了</button>
+    </div>
+</div>
 <div id="toastMessage"></div>
 
 <script>
 (function() {
     // ========== 测试模拟开关 ==========
-    const TEST_MODE = true;   // true: 1天=2秒模拟测试; false: 正常时间
+    const TEST_MODE = false;   // true: 1天=2秒模拟测试; false: 正常时间
+
+    // ========== 本地存储配置 ==========
+    const LOCAL_STORAGE_KEY = 'fridge_local_food_db_v1';
+    const HISTORY_POPUP_STATE_KEY = 'fridge_food_history_popup_state_v2';
 
     const PRODUCT_ID = 'TAC1pGsMiv';
     const DEVICE_NAME = 'FRidge26';
+    // 云端物模型标识符
     const IDS = {
         TEMP: 'temperature_data', HUMI: 'humidity_data', WEIGHT: 'light_intensity_value',
         LED: 'led', BUZZER: 'buzzer', CARD: 'rfid_card_id'
     };
-    const STORAGE_KEY = 'FRidge26_food_records';
 
     // DOM 元素
     const tempSpan = document.getElementById('tempValue'), humiSpan = document.getElementById('humiValue'),
@@ -179,21 +807,26 @@
           buzzerCardUpdate = document.getElementById('buzzerCardUpdate'), assetCardUpdate = document.getElementById('assetCardUpdate');
     const ledDevice = document.getElementById('ledDevice'), buzzerDevice = document.getElementById('buzzerDevice'),
           ledStateText = document.getElementById('ledStateText'), buzzerStateText = document.getElementById('buzzerStateText');
-    const foodNameInput = document.getElementById('foodNameInput'), weightInput = document.getElementById('weightInput'),
+    const cardIdInput = document.getElementById('cardIdInput'), foodNameInput = document.getElementById('foodNameInput'),
           shelfLifeInput = document.getElementById('shelfLifeInput'), setWeightBtn = document.getElementById('setWeightBtn'),
           manualRefreshBtn = document.getElementById('manualRefreshBtn');
     const btnTemp = document.getElementById('btnTemp'), btnHumi = document.getElementById('btnHumi'), btnWeight = document.getElementById('btnWeight');
     const chartDom = document.getElementById('historyChart'), myChart = echarts.init(chartDom);
     const assetTbody = document.getElementById('assetTableBody'), toastEl = document.getElementById('toastMessage');
     const alertOverlay = document.getElementById('alertOverlay'), alertFoodList = document.getElementById('alertFoodList'),
-          alertCloseBtn = document.getElementById('alertCloseBtn');
+            alertCloseBtn = document.getElementById('alertCloseBtn'), historyOverlay = document.getElementById('historyOverlay'),
+            historyFoodList = document.getElementById('historyFoodList'), historyCloseBtn = document.getElementById('historyCloseBtn');
 
     const AUTH_HEADER = 'version=2022-05-01&res=userid%2F359160&et=2132849584&method=sha1&sign=qdEGK8coKGtMoUW7JQ5RyYcuCs4%3D';
     const REFRESH_INTERVAL = 20000;
     const EXPIRY_CHECK_INTERVAL = TEST_MODE ? 500 : 30000;
 
     let ledOn = false, buzzerOn = false, isProcessing = false, isManualRefreshing = false;
-    let refreshTimer = null, isAlertFlashing = false;  // 统一报警标志（LED+蜂鸣器）
+    let refreshTimer = null, isAlertFlashing = false;
+    let latestCloudCardId = '';
+    let latestCloudWeight = '';
+    let latestCloudSnapshotTime = 0;
+    let historyPopupBaselineReady = false;
 
     const chartSensors = [
         { name: '温度', unit: '°C', id: IDS.TEMP, digits: 1, color: '#f97316' },
@@ -201,33 +834,227 @@
         { name: '重量', unit: 'kg', id: IDS.WEIGHT, digits: 0, color: '#10b981' }
     ];
     let currentChartIndex = 0;
-    const historyStore = { [IDS.TEMP]: [], [IDS.HUMI]: [], [IDS.WEIGHT]: [], [IDS.CARD]: [] };
+    // 云端历史数据存储
+    const historyStore = { 
+        [IDS.TEMP]: [], [IDS.HUMI]: [], [IDS.WEIGHT]: [], [IDS.CARD]: []
+    };
 
-    // 本地存储操作
-    function loadLocalRecords() {
-        try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
+    // ========== 本地数据操作函数 ==========
+    function getLocalFoods() {
+        try {
+            const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            return [];
+        }
     }
-    function saveLocalRecords(records) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch(e){ showMessage('存储空间不足'); } }
-    function addLocalRecord(foodName, weight, cardId, shelfLifeDays) {
-        const records = loadLocalRecords();
+
+    function saveLocalFoods(foods) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(foods));
+    }
+
+    function addLocalFood(cardId, cloudWeight, foodName, shelfLifeDays) {
+        const foods = getLocalFoods();
+        // 生成唯一ID
+        const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         const now = Date.now();
         const expiryMs = TEST_MODE ? shelfLifeDays * 2000 : shelfLifeDays * 24 * 60 * 60 * 1000;
-        const newRecord = {
-            id: Date.now().toString() + Math.random().toString(36).substring(2,6),
-            time: new Date().toISOString(), foodName: foodName.trim(), weight, cardId,
-            shelfLifeDays, expiryTime: new Date(now + expiryMs).toISOString(), alerted: false
-        };
-        records.push(newRecord);
-        while (records.length > 200) records.shift();
-        saveLocalRecords(records);
-        return newRecord;
-    }
-    function markRecordsAsAlerted(ids) {
-        const records = loadLocalRecords(); let changed = false;
-        records.forEach(r => { if (ids.includes(r.id) && !r.alerted) { r.alerted = true; changed = true; } });
-        if (changed) saveLocalRecords(records);
+        const weightText = cloudWeight === undefined || cloudWeight === null ? '' : String(cloudWeight).trim();
+        
+        foods.push({
+            id: id,
+            cardId: String(cardId), // 统一转字符串匹配
+            weight: weightText,
+            foodName: foodName,
+            shelfLifeDays: shelfLifeDays,
+            createTime: now,
+            expiryTime: now + expiryMs,
+            alerted: false
+        });
+        
+        saveLocalFoods(foods);
+        return foods;
     }
 
+    function getLatestHistoryValue(identifier) {
+        const records = historyStore[identifier] || [];
+        if (!records.length) {
+            return '';
+        }
+        const latest = [...records].sort((a, b) => b.time - a.time)[0];
+        return latest ? latest.value : '';
+    }
+
+    function getBestLocalFoodMatch(cardId, referenceTime) {
+        const foods = getLocalFoods();
+        const targetCardId = String(cardId || '').trim();
+        let bestFood = null;
+        let bestDiff = Infinity;
+
+        foods.forEach(food => {
+            if (String(food.cardId || '').trim() !== targetCardId) {
+                return;
+            }
+            const diff = Math.abs((food.createTime || 0) - referenceTime);
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                bestFood = food;
+            }
+        });
+
+        return bestFood;
+    }
+
+    function buildCloudFoodEntries() {
+        const cardHistory = [...(historyStore[IDS.CARD] || [])].sort((a, b) => a.time - b.time);
+        const weightHistory = [...(historyStore[IDS.WEIGHT] || [])].sort((a, b) => a.time - b.time);
+        const usedWeightIndexes = new Set();
+        const entries = [];
+        const pairToleranceMs = 5000;
+
+        cardHistory.forEach(cardRecord => {
+            let bestWeightIndex = -1;
+            let bestDiff = Infinity;
+
+            weightHistory.forEach((weightRecord, index) => {
+                if (usedWeightIndexes.has(index)) {
+                    return;
+                }
+
+                const diff = Math.abs(weightRecord.time - cardRecord.time);
+                if (diff < bestDiff) {
+                    bestDiff = diff;
+                    bestWeightIndex = index;
+                }
+            });
+
+            if (bestWeightIndex === -1 || bestDiff > pairToleranceMs) {
+                return;
+            }
+
+            const weightRecord = weightHistory[bestWeightIndex];
+            usedWeightIndexes.add(bestWeightIndex);
+
+            const cardId = cardRecord.value !== undefined && cardRecord.value !== null ? String(cardRecord.value).trim() : '';
+            const weightValue = weightRecord.value !== undefined && weightRecord.value !== null ? String(weightRecord.value).trim() : '';
+            const cloudTime = Math.max(cardRecord.time, weightRecord.time);
+            const localFood = getBestLocalFoodMatch(cardId, cloudTime);
+
+            entries.push({
+                id: `${cardRecord.time}_${weightRecord.time}_${cardId}_${weightValue}`,
+                time: cloudTime,
+                card: cardId || '--',
+                weight: weightValue,
+                name: localFood ? localFood.foodName : '未绑定',
+                shelf: localFood ? localFood.shelfLifeDays : '--',
+                expiry: localFood ? localFood.expiryTime : cloudTime,
+                alerted: localFood ? localFood.alerted : false,
+                hasLocalBinding: Boolean(localFood)
+            });
+        });
+
+        return entries.sort((a, b) => b.time - a.time);
+    }
+
+    function isUsableCloudValue(value) {
+        const text = value === undefined || value === null ? '' : String(value).trim();
+        return text !== '' && text !== '--';
+    }
+
+    function getCloudBindingSnapshot() {
+        const historyCard = getLatestHistoryValue(IDS.CARD);
+        const historyWeight = getLatestHistoryValue(IDS.WEIGHT);
+        const cardId = isUsableCloudValue(latestCloudCardId) ? String(latestCloudCardId).trim() : (isUsableCloudValue(currentCardHint.textContent) ? currentCardHint.textContent.trim() : (isUsableCloudValue(historyCard) ? String(historyCard).trim() : ''));
+        const weight = isUsableCloudValue(latestCloudWeight) ? String(latestCloudWeight).trim() : (isUsableCloudValue(currentWeightHint.textContent) ? currentWeightHint.textContent.trim() : (isUsableCloudValue(historyWeight) ? String(historyWeight).trim() : ''));
+        return {
+            cardId,
+            weight,
+            snapshotTime: latestCloudSnapshotTime || Date.now()
+        };
+    }
+
+    function syncCardInputWithCloud() {
+        const snapshot = getCloudBindingSnapshot();
+        cardIdInput.value = snapshot.cardId;
+    }
+
+    function getHistoryPopupState() {
+        try {
+            const raw = localStorage.getItem(HISTORY_POPUP_STATE_KEY);
+            if (!raw) {
+                return { initialized: false, seenIds: [] };
+            }
+            const parsed = JSON.parse(raw);
+            return {
+                initialized: Boolean(parsed.initialized),
+                seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds.map(String) : []
+            };
+        } catch (e) {
+            return { initialized: false, seenIds: [] };
+        }
+    }
+
+    function saveHistoryPopupState(state) {
+        localStorage.setItem(HISTORY_POPUP_STATE_KEY, JSON.stringify(state));
+    }
+
+    function updateBodyScrollLock() {
+        const overlayVisible = alertOverlay.style.display === 'flex' || historyOverlay.style.display === 'flex';
+        document.body.style.overflow = overlayVisible ? 'hidden' : '';
+    }
+
+    function bootstrapHistoryPopupState(records) {
+        saveHistoryPopupState({
+            initialized: true,
+            seenIds: records.map(record => String(record.id))
+        });
+        historyPopupBaselineReady = true;
+    }
+
+    function showHistoryUpdateDialog(records) {
+        if (!records.length) {
+            return;
+        }
+        if (alertOverlay.style.display === 'flex' || historyOverlay.style.display === 'flex') {
+            return;
+        }
+
+        let html = '';
+        records.forEach(r => {
+            const cardText = r.card !== undefined && r.card !== '' ? String(r.card) : '--';
+            const weightText = r.weight !== undefined && r.weight !== '' ? String(r.weight) : '--';
+            html += `<li>🆕 卡号 ${escapeHtml(cardText)} / 重量 ${escapeHtml(weightText)} kg</li>`;
+        });
+
+        historyFoodList.innerHTML = html;
+        historyOverlay.style.display = 'flex';
+        updateBodyScrollLock();
+
+        const state = getHistoryPopupState();
+        const seen = new Set(state.seenIds);
+        records.forEach(record => seen.add(String(record.id)));
+        state.initialized = true;
+        state.seenIds = Array.from(seen);
+        saveHistoryPopupState(state);
+    }
+
+    function maybeShowHistoryUpdateDialog(records) {
+        if (!historyPopupBaselineReady) {
+            bootstrapHistoryPopupState(records);
+            return;
+        }
+
+        const state = getHistoryPopupState();
+        const seenIds = new Set(state.seenIds);
+        const unseenRecords = records.filter(record => !seenIds.has(String(record.id)));
+        if (!unseenRecords.length) {
+            return;
+        }
+
+        showHistoryUpdateDialog(unseenRecords);
+    }
+
+    // 辅助函数
     function showMessage(text, duration = 2500) {
         toastEl.textContent = text; toastEl.classList.add('show');
         clearTimeout(toastEl._timeout); toastEl._timeout = setTimeout(() => toastEl.classList.remove('show'), duration);
@@ -244,6 +1071,7 @@
         const state = buzzerOn ? '打开' : '关闭'; buzzerStateText.innerText = state; buzzerStateText.className = 'device-state' + (buzzerOn?' on':'');
         buzzerCardSpan.textContent = state; buzzerCardSpan.className = buzzerOn ? 'status-badge on' : 'status-badge';
     }
+    function escapeHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
     // API调用
     async function fetchHistoryForIdentifier(id) {
@@ -254,14 +1082,13 @@
             return (d.code===0 && d.data?.list) ? d.data.list.map(i=>({time:i.time, value:i.value})) : [];
         } catch(e){ return []; }
     }
-    async function setMultipleDesired(paramsObj) {
+    async function setDeviceDesired(identifier, value) {
         const url = 'https://iot-api.heclouds.com/thingmodel/set-device-desired-property';
         try {
-            const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','authorization':AUTH_HEADER}, body:JSON.stringify({product_id:PRODUCT_ID, device_name:DEVICE_NAME, params:paramsObj})});
+            const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','authorization':AUTH_HEADER}, body:JSON.stringify({product_id:PRODUCT_ID, device_name:DEVICE_NAME, params:{[identifier]: value}})});
             return (await r.json()).code === 0;
         } catch(e){ return false; }
     }
-    async function setDeviceDesired(identifier, value) { return setMultipleDesired({[identifier]: value}); }
     async function fetchRealtimeData() {
         const url = `https://iot-api.heclouds.com/thingmodel/query-device-property?product_id=${PRODUCT_ID}&device_name=${DEVICE_NAME}`;
         try {
@@ -270,73 +1097,85 @@
                 const map = {}; d.data.forEach(i=>map[i.identifier]=i);
                 if(map[IDS.TEMP]?.value!==undefined) tempSpan.textContent = parseFloat(map[IDS.TEMP].value).toFixed(1);
                 if(map[IDS.HUMI]?.value!==undefined) humiSpan.textContent = parseInt(map[IDS.HUMI].value);
-                if(map[IDS.WEIGHT]?.value!==undefined) { const w=parseInt(map[IDS.WEIGHT].value); weightSpan.textContent=w; currentWeightHint.textContent=w; }
-                if(map[IDS.CARD]?.value!==undefined) { const c=map[IDS.CARD].value; const cs=(c!==undefined&&c!==null)?c.toString():'--'; assetCardSpan.textContent=cs; currentCardHint.textContent=cs; }
-                // 报警期间不更新LED/蜂鸣器状态，避免覆盖报警效果
+                if(map[IDS.WEIGHT]?.value!==undefined) {
+                    const weightText = map[IDS.WEIGHT].value !== undefined && map[IDS.WEIGHT].value !== null ? String(map[IDS.WEIGHT].value).trim() : '';
+                    latestCloudWeight = weightText;
+                    weightSpan.textContent = weightText || '--';
+                    currentWeightHint.textContent = weightText || '--';
+                }
+                if(map[IDS.CARD]?.value!==undefined) {
+                    const cardText = map[IDS.CARD].value !== undefined && map[IDS.CARD].value !== null ? String(map[IDS.CARD].value).trim() : '';
+                    latestCloudCardId = cardText;
+                    assetCardSpan.textContent = cardText || '--';
+                    currentCardHint.textContent = cardText || '--';
+                }
                 if(map[IDS.LED]?.value!==undefined && !isAlertFlashing) { ledOn = (map[IDS.LED].value==1||map[IDS.LED].value==='1'||map[IDS.LED].value===true); updateLedUI(); }
                 if(map[IDS.BUZZER]?.value!==undefined && !isAlertFlashing) { buzzerOn = (map[IDS.BUZZER].value==1||map[IDS.BUZZER].value==='1'||map[IDS.BUZZER].value===true); updateBuzzerUI(); }
+                latestCloudSnapshotTime = Date.now();
+                syncCardInputWithCloud();
             }
         } catch(e){}
     }
 
-    // 🔔 LED + 蜂鸣器 联合报警（同时响5秒）
+    // 报警功能
     async function triggerAlert(durationMs = 5000) {
         if (isAlertFlashing) return;
         isAlertFlashing = true;
-        const prevLed = ledOn;
-        const prevBuzzer = buzzerOn;
+        const prevLed = ledOn; const prevBuzzer = buzzerOn;
         try {
-            // 同时打开LED和蜂鸣器
-            await setMultipleDesired({ [IDS.LED]: 1, [IDS.BUZZER]: 1 });
-            ledOn = true; buzzerOn = true;
-            updateLedUI(); updateBuzzerUI();
-
-            // 持续5秒
+            // 模拟本地报警，不下发命令避免冲突
+            ledOn = true; buzzerOn = true; updateLedUI(); updateBuzzerUI();
             await new Promise(r => setTimeout(r, durationMs));
+            ledOn = prevLed; buzzerOn = prevBuzzer; updateLedUI(); updateBuzzerUI();
+        } catch(e) { console.warn('报警触发失败', e); }
+        finally { isAlertFlashing = false; }
+    }
 
-            // 恢复之前的状态
-            const restoreParams = {};
-            if (!prevLed) restoreParams[IDS.LED] = 0; else restoreParams[IDS.LED] = 1;
-            if (!prevBuzzer) restoreParams[IDS.BUZZER] = 0; else restoreParams[IDS.BUZZER] = 1;
-            await setMultipleDesired(restoreParams);
-            ledOn = prevLed; buzzerOn = prevBuzzer;
-            updateLedUI(); updateBuzzerUI();
-        } catch(e) {
-            console.warn('报警触发失败', e);
-            // 异常时也尝试恢复
-            ledOn = prevLed; buzzerOn = prevBuzzer;
-            updateLedUI(); updateBuzzerUI();
-        } finally {
-            isAlertFlashing = false;
+    // 本地食物过期检查
+    function checkExpiryAndAlert() {
+        if (alertOverlay.style.display === 'flex' || historyOverlay.style.display === 'flex') {
+            return;
+        }
+        const foods = getLocalFoods();
+        const now = Date.now();
+        let hasOverdue = false;
+        const overdueList = [];
+
+        foods.forEach(food => {
+            if (!food.alerted && food.expiryTime <= now) {
+                hasOverdue = true;
+                food.alerted = true;
+                overdueList.push(food);
+            }
+        });
+
+        if (hasOverdue) {
+            saveLocalFoods(foods); // 保存已报警状态
+            showAlertDialog(overdueList);
+            triggerAlert(5000);
+            renderAssetTable();
         }
     }
 
-    // 保质期检查与报警
-    function checkExpiryAndAlert() {
-        const records = loadLocalRecords(), now = Date.now();
-        const overdue = records.filter(r => !r.alerted && new Date(r.expiryTime).getTime() <= now);
-        if (!overdue.length) return;
-        markRecordsAsAlerted(overdue.map(r=>r.id));
-        showAlertDialog(overdue);
-        triggerAlert(5000);  // LED+蜂鸣器同时响5秒
-        renderAssetTable();
-    }
+    // 报警弹窗
     function showAlertDialog(overdueRecords) {
-        let html = ''; const now = Date.now();
+        let html = '';
         overdueRecords.forEach(r => {
-            const diffMs = now - new Date(r.expiryTime).getTime();
+            const now = Date.now();
+            const diffMs = now - r.expiryTime;
             const sec = Math.ceil(diffMs / 1000);
-            const tag = diffMs >= 0 ? `已过期 ${sec} 秒` : `即将到期`;
-            html += `<li>📦 <strong>${escapeHtml(r.foodName)}</strong> - 重量${r.weight}kg - 卡号${r.cardId} <span style="color:#dc2626;">${tag}</span></li>`;
+            html += `<li>📦 <strong>${escapeHtml(r.foodName)}</strong> - 卡号${r.cardId} <span style="color:#dc2626;">已过期 ${sec}秒</span></li>`;
         });
-        alertFoodList.innerHTML = html; alertOverlay.style.display = 'flex'; document.body.style.overflow = 'hidden';
+        alertFoodList.innerHTML = html; alertOverlay.style.display = 'flex'; updateBodyScrollLock();
     }
-    function hideAlertDialog() { alertOverlay.style.display = 'none'; document.body.style.overflow = ''; renderAssetTable(); }
-    function escapeHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    function hideAlertDialog() { alertOverlay.style.display = 'none'; updateBodyScrollLock(); renderAssetTable(); }
     alertCloseBtn.addEventListener('click', hideAlertDialog);
     alertOverlay.addEventListener('click', e => { if(e.target===alertOverlay) hideAlertDialog(); });
+    function hideHistoryDialog() { historyOverlay.style.display = 'none'; updateBodyScrollLock(); renderAssetTable(); }
+    historyCloseBtn.addEventListener('click', hideHistoryDialog);
+    historyOverlay.addEventListener('click', e => { if(e.target===historyOverlay) hideHistoryDialog(); });
 
-    // 图表
+    // 图表渲染
     function renderChart() {
         const s = chartSensors[currentChartIndex], recs = historyStore[s.id] || [];
         const sorted = [...recs].sort((a,b)=>a.time-b.time);
@@ -350,79 +1189,142 @@
         }, {replaceMerge:['series']});
     }
 
-    // 表格渲染
+    // 云端食物表格渲染 (结合本地数据)
     function renderAssetTable() {
-        const records = loadLocalRecords();
-        if (!records.length) { assetTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">暂无食物记录</td></tr>'; return; }
-        const sorted = [...records].sort((a,b)=>new Date(b.time)-new Date(a.time));
+        const displayData = buildCloudFoodEntries();
+
+        if (!displayData.length) { 
+            assetTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">暂无云端食物记录，请先让设备上报卡号和重量，再录入食物</td></tr>'; 
+            if (!historyPopupBaselineReady) {
+                bootstrapHistoryPopupState(displayData);
+            }
+            return; 
+        }
+
         const now = Date.now();
         let html = '';
-        sorted.slice(0,50).forEach(r => {
-            const timeStr = new Date(r.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-            const expiry = new Date(r.expiryTime), diffMs = expiry.getTime() - now;
+        
+        displayData.slice(0, 50).forEach(r => {
+            const timeStr = new Date(r.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+            const expiry = new Date(r.expiry);
+            const diffMs = expiry.getTime() - now;
+            
             let statusHtml, statusClass;
-            if (diffMs <= 0) { statusHtml = `已过期 ${Math.ceil(-diffMs/1000)}秒`; statusClass = 'status-badge expired'; }
-            else if (diffMs <= 3000) { statusHtml = `即将到期 (${Math.ceil(diffMs/1000)}秒)`; statusClass = 'status-badge on'; }
-            else { statusHtml = `正常 (约${Math.ceil(diffMs/1000)}秒后)`; statusClass = 'status-badge'; }
+            if (!r.hasLocalBinding) {
+                statusHtml = `待绑定`; statusClass = 'status-badge pending';
+            } else if (r.alerted || diffMs <= 0) { 
+                statusHtml = `已过期`; statusClass = 'status-badge expired'; 
+            } else if (diffMs <= 24 * 60 * 60 * 1000) { 
+                statusHtml = `即将到期`; statusClass = 'status-badge on'; 
+            } else { 
+                statusHtml = `正常`; statusClass = 'status-badge'; 
+            }
+
+            const expiryText = r.hasLocalBinding ? new Date(r.expiry).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '--';
+
             html += `<tr>
-                <td>${timeStr}</td><td><span class="food-name-tag">🍎 ${escapeHtml(r.foodName)}</span></td>
-                <td class="weight-value">${r.weight} kg</td><td><span class="asset-card-id">${r.cardId}</span></td>
-                <td>${r.shelfLifeDays} 天</td><td>${expiry.toLocaleTimeString('zh-CN',{hour12:false})}</td>
-                <td><span class="${statusClass}">${statusHtml}</span></td></tr>`;
+                <td>${timeStr}</td>
+                <td><span class="asset-card-id">${r.card || '--'}</span></td>
+                <td><span class="food-name-tag">🍎 ${escapeHtml(r.name || '未命名')}</span></td>
+                <td class="weight-value">${r.weight !== undefined && r.weight !== '' ? escapeHtml(String(r.weight)) + ' kg' : '--'}</td>
+                <td>${r.shelf || '--'} 天</td>
+                <td>${expiryText}</td>
+                <td><span class="${statusClass}">${statusHtml}</span></td>
+            </tr>`;
         });
         assetTbody.innerHTML = html;
+        maybeShowHistoryUpdateDialog(displayData);
     }
 
-    // 核心刷新
+    // 核心刷新（拉取云端所有数据）
     async function refreshAllData() {
         const ids = [IDS.TEMP, IDS.HUMI, IDS.WEIGHT, IDS.CARD];
         const results = await Promise.allSettled(ids.map(id=>fetchHistoryForIdentifier(id)));
         results.forEach((r,i)=>{ if(r.status==='fulfilled') historyStore[ids[i]] = r.value; });
-        renderChart(); renderAssetTable(); await fetchRealtimeData(); updateTimestamps();
+        await fetchRealtimeData();
+        syncCardInputWithCloud();
+        renderChart();
+        renderAssetTable();
+        updateTimestamps();
     }
 
-    // 设备点击（报警期间禁止手动操作LED和蜂鸣器）
+    // ========== 修复后的设备控制函数 ==========
     async function handleDeviceClick(type) {
-        if (isProcessing || isAlertFlashing) { showMessage(isAlertFlashing ? '报警进行中，请稍后操作' : '操作暂时不可用'); return; }
-        const isLed = type==='led'; const target = isLed ? !ledOn : !buzzerOn;
-        const id = isLed ? IDS.LED : IDS.BUZZER; const name = isLed ? 'LED' : '蜂鸣器';
-        isProcessing = true; ledDevice.style.pointerEvents='none'; buzzerDevice.style.pointerEvents='none';
+        if (isProcessing || isAlertFlashing) {
+            showMessage(isAlertFlashing ? '报警进行中，请稍后操作' : '操作暂时不可用');
+            return;
+        }
+        const isLed = type === 'led';
+        // 修复：根据对应设备的状态取反
+        const target = isLed ? !ledOn : !buzzerOn;
+        const id = isLed ? IDS.LED : IDS.BUZZER;
+        const name = isLed ? 'LED' : '蜂鸣器';
+
+        isProcessing = true;
+        ledDevice.style.pointerEvents = 'none';
+        buzzerDevice.style.pointerEvents = 'none';
         try {
-            if (await setDeviceDesired(id, target?1:0)) {
-                if (isLed) { ledOn = target; updateLedUI(); } else { buzzerOn = target; updateBuzzerUI(); }
-                showMessage(`${name} ${target?'打开':'关闭'}成功，5秒后刷新`);
-                clearTimeout(refreshTimer); refreshTimer = setTimeout(()=>{refreshAllData(); refreshTimer=null;}, 5000);
-            } else showMessage('操作失败');
-        } catch(e){ showMessage('网络异常'); }
-        finally { isProcessing=false; ledDevice.style.pointerEvents=''; buzzerDevice.style.pointerEvents=''; }
+            if (await setDeviceDesired(id, target ? 1 : 0)) {
+                if (isLed) {
+                    ledOn = target;
+                    updateLedUI();
+                } else {
+                    buzzerOn = target;
+                    updateBuzzerUI();
+                }
+                showMessage(`${name} ${target ? '打开' : '关闭'}成功`);
+            } else {
+                showMessage('操作失败');
+            }
+        } catch (e) {
+            showMessage('网络异常');
+        } finally {
+            isProcessing = false;
+            ledDevice.style.pointerEvents = '';
+            buzzerDevice.style.pointerEvents = '';
+        }
     }
 
-    // 录入食物
+    // 录入食物 → 保存本地
     async function handleSetWeight() {
         const food = foodNameInput.value.trim(); if(!food){showMessage('请输入食物名称');foodNameInput.focus();return;}
-        const wRaw = weightInput.value.trim(); if(!wRaw){showMessage('请输入重量');weightInput.focus();return;}
-        const w = parseInt(wRaw); if(isNaN(w)||w<0||w>6000){showMessage('重量需0-6000整数');return;}
         const sRaw = shelfLifeInput.value.trim(); if(!sRaw){showMessage('请输入保质期天数');shelfLifeInput.focus();return;}
         const days = parseInt(sRaw); if(isNaN(days)||days<1||days>365){showMessage('保质期需1-365天');return;}
-        let card = currentCardHint.textContent; let cardInt = 0;
-        if(card && card!=='--') { const p=parseInt(card); if(!isNaN(p)) cardInt = p; else showMessage('卡号格式异常，使用0'); }
+
+        const cloudSnapshot = getCloudBindingSnapshot();
+        if (!cloudSnapshot.cardId) {
+            showMessage('当前未获取到云端卡号，请先刷新后再录入');
+            return;
+        }
+        if (!isUsableCloudValue(cloudSnapshot.weight)) {
+            showMessage('当前未获取到云端重量，请先刷新后再录入');
+            return;
+        }
+        
         if(isProcessing){showMessage('操作进行中');return;}
         isProcessing=true; setWeightBtn.disabled=true;
+        
         try {
-            if (await setMultipleDesired({[IDS.WEIGHT]:w, [IDS.CARD]:cardInt})) {
-                addLocalRecord(food, w, cardInt, days);
-                showMessage(`✅ ${food} 已录入 (${w}kg, ${days}天)`, 2500);
-                foodNameInput.value=''; weightInput.value=''; shelfLifeInput.value='';
-                renderAssetTable();
-                clearTimeout(refreshTimer); refreshTimer = setTimeout(()=>{refreshAllData();}, 5000);
-            } else showMessage('平台设置失败');
-        } catch(e){ showMessage('网络错误'); }
-        finally { isProcessing=false; setWeightBtn.disabled=false; }
+            addLocalFood(cloudSnapshot.cardId, cloudSnapshot.weight, food, days);
+            showMessage(`✅ ${food} 已绑定卡号 ${cloudSnapshot.cardId} 并保存到本地`, 2500);
+            
+            foodNameInput.value=''; 
+            shelfLifeInput.value='';
+
+            await refreshAllData();
+        } catch(e){ 
+            showMessage('保存失败'); 
+        }
+        finally { 
+            isProcessing=false; 
+            setWeightBtn.disabled=false; 
+        }
     }
 
+    // 手动刷新
     async function handleManualRefresh() {
         if(isManualRefreshing) return; isManualRefreshing=true; manualRefreshBtn.disabled=true;
-        showMessage('刷新中…',1000); try{await refreshAllData();showMessage('刷新成功');}catch(e){showMessage('刷新失败');}
+        showMessage('云端刷新中…',1000); try{await refreshAllData();showMessage('刷新成功');}catch(e){showMessage('刷新失败');}
         finally{isManualRefreshing=false;manualRefreshBtn.disabled=false;}
     }
 
@@ -438,16 +1340,13 @@
     btnHumi.addEventListener('click', ()=>switchChart(1));
     btnWeight.addEventListener('click', ()=>switchChart(2));
     window.addEventListener('resize', ()=>myChart.resize());
-    foodNameInput.addEventListener('keydown', e=>{if(e.key==='Enter')shelfLifeInput.focus();});
-    weightInput.addEventListener('keydown', e=>{if(e.key==='Enter')handleSetWeight();});
-    shelfLifeInput.addEventListener('keydown', e=>{if(e.key==='Enter')handleSetWeight();});
 
     // 初始化
     refreshAllData();
     setInterval(refreshAllData, REFRESH_INTERVAL);
     setInterval(checkExpiryAndAlert, EXPIRY_CHECK_INTERVAL);
-    setTimeout(checkExpiryAndAlert, TEST_MODE ? 1000 : 5000);
-    updateLedUI(); updateBuzzerUI(); switchChart(0); renderAssetTable();
+    setTimeout(checkExpiryAndAlert, 1000);
+    updateLedUI(); updateBuzzerUI(); switchChart(0); syncCardInputWithCloud();
 })();
 </script>
 </body>
