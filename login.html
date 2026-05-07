@@ -657,7 +657,7 @@
         </div>
         <div class="sensor-card">
             <div class="card-label"><i class="fas fa-weight-hanging"></i> 重量</div>
-            <div class="card-value"><span id="weightValue">--</span><span class="card-unit">kg</span></div>
+            <div class="card-value"><span id="weightValue">--</span><span class="card-unit">g</span></div>
             <div class="update-tag" id="weightUpdate"></div>
         </div>
         <div class="sensor-card">
@@ -718,7 +718,7 @@
             </div>
         </div>
         <div class="current-asset-info">
-            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> | 当前重量: <strong id="currentWeightHint">--</strong> kg
+            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> | 当前重量: <strong id="currentWeightHint">--</strong> g
             <span style="margin-left: 0.6rem;">💾 食物名称和保质期保存在本地，卡号/重量自动同步云端</span>
         </div>
     </div>
@@ -831,7 +831,7 @@
     const chartSensors = [
         { name: '温度', unit: '°C', id: IDS.TEMP, digits: 1, color: '#f97316' },
         { name: '湿度', unit: '%RH', id: IDS.HUMI, digits: 1, color: '#3b82f6' },
-        { name: '重量', unit: 'kg', id: IDS.WEIGHT, digits: 0, color: '#10b981' }
+        { name: '重量', unit: 'g', id: IDS.WEIGHT, digits: 0, color: '#10b981' }
     ];
     let currentChartIndex = 0;
     // 云端历史数据存储
@@ -1023,7 +1023,7 @@
         records.forEach(r => {
             const cardText = r.card !== undefined && r.card !== '' ? String(r.card) : '--';
             const weightText = r.weight !== undefined && r.weight !== '' ? String(r.weight) : '--';
-            html += `<li>🆕 卡号 ${escapeHtml(cardText)} / 重量 ${escapeHtml(weightText)} kg</li>`;
+            html += `<li>🆕 卡号 ${escapeHtml(cardText)} / 重量 ${escapeHtml(weightText)} g</li>`;
         });
 
         historyFoodList.innerHTML = html;
@@ -1226,7 +1226,7 @@
                 <td>${timeStr}</td>
                 <td><span class="asset-card-id">${r.card || '--'}</span></td>
                 <td><span class="food-name-tag">🍎 ${escapeHtml(r.name || '未命名')}</span></td>
-                <td class="weight-value">${r.weight !== undefined && r.weight !== '' ? escapeHtml(String(r.weight)) + ' kg' : '--'}</td>
+                <td class="weight-value">${r.weight !== undefined && r.weight !== '' ? escapeHtml(String(r.weight)) + ' g' : '--'}</td>
                 <td>${r.shelf || '--'} 天</td>
                 <td>${expiryText}</td>
                 <td><span class="${statusClass}">${statusHtml}</span></td>
