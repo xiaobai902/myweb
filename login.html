@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>冰箱 · 智能监测 FRidge26 (云端版)</title>
+    <title>冰箱 · 智能监测 FRidge (云端版)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js">
     </script>
@@ -641,7 +641,7 @@
 </head>
 <body>
 <div class="dashboard">
-    <h1 class="page-title"><i class="fas fa-temperature-low"></i> 冰箱 · 智能监测 FRidge26 <span class="test-badge">☁️ 云端存储</span></h1>
+    <h1 class="page-title"><i class="fas fa-temperature-low"></i> 冰箱 · 智能监测 FRidge <span class="test-badge">☁️ 云端存储</span></h1>
 
     <!-- 6个核心卡片 -->
     <div class="cards-grid">
@@ -657,7 +657,7 @@
         </div>
         <div class="sensor-card">
             <div class="card-label"><i class="fas fa-weight-hanging"></i> 重量</div>
-            <div class="card-value"><span id="weightValue">--</span><span class="card-unit">g</span></div>
+            <div class="card-value"><span id="weightValue">--</span><span class="card-unit">kg</span></div>
             <div class="update-tag" id="weightUpdate"></div>
         </div>
         <div class="sensor-card">
@@ -692,16 +692,16 @@
         </div>
     </div>
 
-    <!-- 食物录入 -->
+    <!-- 物品录入 -->
     <div class="asset-control-section">
-        <h2 class="section-title"><i class="fas fa-balance-scale"></i> 食物名称与保质期管理 (自动绑定云端卡号)</h2>
+        <h2 class="section-title"><i class="fas fa-balance-scale"></i> 物品名称与保质期管理 (自动绑定云端卡号)</h2>
         <div class="asset-control-panel">
             <div class="asset-control-group">
                 <label><i class="fas fa-id-card"></i> 当前云端卡号</label>
                 <input type="text" id="cardIdInput" placeholder="自动同步云端卡号" readonly>
             </div>
             <div class="asset-control-group">
-                <label><i class="fas fa-apple-alt"></i> 食物名称</label>
+                <label><i class="fas fa-apple-alt"></i> 物品名称</label>
                 <input type="text" id="foodNameInput" placeholder="例如：牛奶">
             </div>
             <div class="asset-control-group">
@@ -710,7 +710,7 @@
             </div>
             <div class="asset-control-group" style="flex: 0 0 auto;">
                 <label>&nbsp;</label>
-                <button class="asset-set-btn" id="setWeightBtn"><i class="fas fa-save"></i> 录入食物</button>
+                <button class="asset-set-btn" id="setWeightBtn"><i class="fas fa-save"></i> 录入物品</button>
             </div>
             <div class="asset-control-group" style="flex: 0 0 auto;">
                 <label>&nbsp;</label>
@@ -718,8 +718,8 @@
             </div>
         </div>
         <div class="current-asset-info">
-            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> | 当前重量: <strong id="currentWeightHint">--</strong> g
-            <span style="margin-left: 0.6rem;">💾 食物名称和保质期保存在本地，卡号/重量自动同步云端</span>
+            <i class="fas fa-info-circle"></i> 当前卡号: <strong id="currentCardIdHint">--</strong> | 当前重量: <strong id="currentWeightHint">--</strong> kg
+            <span style="margin-left: 0.6rem;">💾 物品名称和保质期保存在本地</span>
         </div>
     </div>
 
@@ -736,16 +736,16 @@
         <div id="historyChart"></div>
     </div>
 
-    <!-- 云端食物历史记录表 -->
+    <!-- 云端物品历史记录表 -->
     <div class="asset-table-section">
-        <h3 class="section-title"><i class="fas fa-cloud"></i> 食物录入历史(云端+本地)</h3>
+        <h3 class="section-title"><i class="fas fa-cloud"></i> 物品录入历史</h3>
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>录入时间</th>
                         <th>卡号</th>
-                        <th>食物</th>
+                        <th>物品</th>
                         <th>重量</th>
                         <th>保质期(天)</th>
                         <th>到期时间</th>
@@ -763,8 +763,8 @@
 <div id="alertOverlay" class="alert-overlay" style="display:none;">
     <div class="alert-dialog">
         <div class="alert-icon">🚨</div>
-        <h3>⚠️ 食物保质期到期提醒</h3>
-        <p style="text-align:center;color:#6b7280;">以下食物已过期，请及时处理：</p>
+        <h3>⚠️ 物品保质期到期提醒</h3>
+        <p style="text-align:center;color:#6b7280;">以下物品已过期，请及时处理：</p>
         <ul class="alert-list" id="alertFoodList"></ul>
         <button class="alert-close-btn" id="alertCloseBtn"><i class="fas fa-check-circle"></i> 我知道了</button>
     </div>
@@ -772,7 +772,7 @@
 <div id="historyOverlay" class="alert-overlay" style="display:none;">
     <div class="alert-dialog history-dialog">
         <div class="alert-icon">🆕</div>
-        <h3>食物录入历史更新</h3>
+        <h3>物品录入历史更新</h3>
         <p style="text-align:center;color:#6b7280;">以下新增记录已同步到历史列表：</p>
         <ul class="alert-list" id="historyFoodList"></ul>
         <button class="alert-close-btn" id="historyCloseBtn"><i class="fas fa-check-circle"></i> 我知道了</button>
@@ -831,7 +831,7 @@
     const chartSensors = [
         { name: '温度', unit: '°C', id: IDS.TEMP, digits: 1, color: '#f97316' },
         { name: '湿度', unit: '%RH', id: IDS.HUMI, digits: 1, color: '#3b82f6' },
-        { name: '重量', unit: 'g', id: IDS.WEIGHT, digits: 0, color: '#10b981' }
+        { name: '重量', unit: 'kg', id: IDS.WEIGHT, digits: 0, color: '#10b981' }
     ];
     let currentChartIndex = 0;
     // 云端历史数据存储
@@ -1023,7 +1023,7 @@
         records.forEach(r => {
             const cardText = r.card !== undefined && r.card !== '' ? String(r.card) : '--';
             const weightText = r.weight !== undefined && r.weight !== '' ? String(r.weight) : '--';
-            html += `<li>🆕 卡号 ${escapeHtml(cardText)} / 重量 ${escapeHtml(weightText)} g</li>`;
+            html += `<li>🆕 卡号 ${escapeHtml(cardText)} / 重量 ${escapeHtml(weightText)} kg</li>`;
         });
 
         historyFoodList.innerHTML = html;
@@ -1131,7 +1131,7 @@
         finally { isAlertFlashing = false; }
     }
 
-    // 本地食物过期检查
+    // 本地物品过期检查
     function checkExpiryAndAlert() {
         if (alertOverlay.style.display === 'flex' || historyOverlay.style.display === 'flex') {
             return;
@@ -1189,12 +1189,12 @@
         }, {replaceMerge:['series']});
     }
 
-    // 云端食物表格渲染 (结合本地数据)
+    // 云端物品表格渲染 (结合本地数据)
     function renderAssetTable() {
         const displayData = buildCloudFoodEntries();
 
         if (!displayData.length) { 
-            assetTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">暂无云端食物记录，请先让设备上报卡号和重量，再录入食物</td></tr>'; 
+            assetTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">暂无云端物品记录，请先让设备上报卡号和重量，再录入物品</td></tr>'; 
             if (!historyPopupBaselineReady) {
                 bootstrapHistoryPopupState(displayData);
             }
@@ -1226,7 +1226,7 @@
                 <td>${timeStr}</td>
                 <td><span class="asset-card-id">${r.card || '--'}</span></td>
                 <td><span class="food-name-tag">🍎 ${escapeHtml(r.name || '未命名')}</span></td>
-                <td class="weight-value">${r.weight !== undefined && r.weight !== '' ? escapeHtml(String(r.weight)) + ' g' : '--'}</td>
+                <td class="weight-value">${r.weight !== undefined && r.weight !== '' ? escapeHtml(String(r.weight)) + ' kg' : '--'}</td>
                 <td>${r.shelf || '--'} 天</td>
                 <td>${expiryText}</td>
                 <td><span class="${statusClass}">${statusHtml}</span></td>
@@ -1285,9 +1285,9 @@
         }
     }
 
-    // 录入食物 → 保存本地
+    // 录入物品 → 保存本地
     async function handleSetWeight() {
-        const food = foodNameInput.value.trim(); if(!food){showMessage('请输入食物名称');foodNameInput.focus();return;}
+        const food = foodNameInput.value.trim(); if(!food){showMessage('请输入物品名称');foodNameInput.focus();return;}
         const sRaw = shelfLifeInput.value.trim(); if(!sRaw){showMessage('请输入保质期天数');shelfLifeInput.focus();return;}
         const days = parseInt(sRaw); if(isNaN(days)||days<1||days>365){showMessage('保质期需1-365天');return;}
 
