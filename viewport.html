@@ -300,8 +300,8 @@
             font-size: 14px;
             font-weight: 600;
             color: #000;
-            position: sticky;
-            top: 0;
+            position: relative;
+            flex-shrink: 0;
             z-index: 50;
         }
         .status-bar .time {
@@ -341,31 +341,8 @@
         .wifi-icon {
             width: 14px;
             height: 10px;
-            position: relative;
-        }
-        .wifi-icon::before {
-            content: '';
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #000;
-            border-radius: 50%;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .wifi-icon::after {
-            content: '';
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border: 1.5px solid #000;
-            border-radius: 50%;
-            border-bottom-color: transparent;
-            border-left-color: transparent;
-            transform: rotate(-45deg);
-            top: -2px;
-            left: 0;
+            display: block;
+            flex-shrink: 0;
         }
 
         .battery-icon {
@@ -804,7 +781,7 @@
             <div class="section-title">基本信息</div>
             <div class="form-group">
                 <label>发布者昵称</label>
-                <input type="text" id="nickname" value="小白" placeholder="输入昵称">
+                <input type="text" id="nickname" value="JunT" placeholder="输入昵称">
             </div>
             <div class="form-group">
                 <label>发布者头像</label>
@@ -890,7 +867,12 @@
                                 <div class="signal-bar"></div><div class="signal-bar"></div>
                             </div>
                             <div style="font-size:11px;font-weight:600;margin-left:2px;">5G</div>
-                            <div class="wifi-icon" style="margin-left:2px;"></div>
+                            <svg class="wifi-icon" style="margin-left:2px;" viewBox="0 0 14 10" fill="none" aria-hidden="true">
+                                <path d="M1.5 3.2a8.5 8.5 0 0 1 11 0" stroke="#000" stroke-width="1.4" stroke-linecap="round" />
+                                <path d="M3.8 5.8a5 5 0 0 1 6.4 0" stroke="#000" stroke-width="1.4" stroke-linecap="round" />
+                                <path d="M6.2 8a1.5 1.5 0 0 1 1.6 0" stroke="#000" stroke-width="1.4" stroke-linecap="round" />
+                                <circle cx="7" cy="8.4" r="0.7" fill="#000" />
+                            </svg>
                             <div class="battery-icon" style="margin-left:2px;">
                                 <div class="battery-level" id="batteryFill" style="width:85%"></div>
                             </div>
@@ -913,7 +895,7 @@
                             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Crect width='44' height='44' fill='%23e0e0e0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='%23999'%3E👤%3C/text%3E%3C/svg%3E"
                             crossorigin="anonymous">
                             <div class="moment-header">
-                                <div class="moment-nickname" id="previewNickname">小白</div>
+                                <div class="moment-nickname" id="previewNickname">JunT</div>
                             </div>
                             <div class="moment-text" id="previewText">工程师手里握着的不是图纸和参数，是无数人的生命与信任。…</div>
                             <div class="moment-images" id="previewImages"></div>
@@ -1319,6 +1301,9 @@
                 const overlay = document.getElementById('loadingOverlay');
                 overlay.classList.add('active');
                 const captureArea = document.getElementById('captureArea');
+                const rect = captureArea.getBoundingClientRect();
+                const captureWidth = Math.ceil(rect.width);
+                const captureHeight = Math.ceil(rect.height);
                 const allImages = captureArea.querySelectorAll('img');
                 const imagePromises = Array.from(allImages).map(img => {
                     if (img.complete && img.naturalWidth > 0) {
@@ -1334,13 +1319,24 @@
                 Promise.all(imagePromises).then(() => {
                     setTimeout(() => {
                         html2canvas(captureArea, {
-                            scale: 3,
-                            width: 375,   // 固定宽度
-                            height: 812,  // 固定高度，确保截图比例与预览一致
+                            scale: Math.min(2, window.devicePixelRatio || 1),
+                            width: captureWidth,
+                            height: captureHeight,
+                            windowWidth: captureWidth,
+                            windowHeight: captureHeight,
+                            scrollX: 0,
+                            scrollY: 0,
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: '#ffffff',
                             logging: false,
+                            onclone: (clonedDoc) => {
+                                const clonedCaptureArea = clonedDoc.getElementById('captureArea');
+                                if (clonedCaptureArea) {
+                                    clonedCaptureArea.style.width = `${captureWidth}px`;
+                                    clonedCaptureArea.style.height = `${captureHeight}px`;
+                                }
+                            },
                         }).then(canvas => {
                             overlay.classList.remove('active');
                             const link = document.createElement('a');
