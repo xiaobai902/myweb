@@ -7,6 +7,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
     </script>
     <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -1303,9 +1308,8 @@
                 const overlay = document.getElementById('loadingOverlay');
                 overlay.classList.add('active');
                 const captureArea = document.getElementById('captureArea');
-                const rect = captureArea.getBoundingClientRect();
-                const captureWidth = Math.ceil(rect.width);
-                const captureHeight = Math.ceil(rect.height);
+                const captureWidth = 375;
+                const captureHeight = 812;
                 const allImages = captureArea.querySelectorAll('img');
                 const imagePromises = Array.from(allImages).map(img => {
                     if (img.complete && img.naturalWidth > 0) {
@@ -1337,6 +1341,12 @@
                                 if (clonedCaptureArea) {
                                     clonedCaptureArea.style.width = `${captureWidth}px`;
                                     clonedCaptureArea.style.height = `${captureHeight}px`;
+                                    clonedCaptureArea.style.minWidth = `${captureWidth}px`;
+                                    clonedCaptureArea.style.maxWidth = `${captureWidth}px`;
+                                }
+                                const clonedPhoneFrame = clonedDoc.querySelector('.phone-frame');
+                                if (clonedPhoneFrame) {
+                                    clonedPhoneFrame.style.padding = '0';
                                 }
                             },
                         }).then(canvas => {
