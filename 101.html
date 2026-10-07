@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>党建应知应会100题 · 随机刷题</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23B7262D'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23F3D27A' font-family='serif' font-weight='bold'%3E%E5%85%9A%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --red:#B7262D; --red-deep:#8C1C21; --red-soft:#F7E9EA;
+  --bg:#F5F1EA; --card:#FFFFFF; --ink:#2A2320; --sub:#8A7F76;
+  --gold:#B89B5E; --green:#2E7D32; --green-bg:#E8F3E9;
+  --line:#EAE3D8; --shadow:0 6px 24px rgba(120,60,40,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+.serif{font-family:"Noto Serif SC","Songti SC","SimSun",serif}
+.hidden{display:none!important}
+
+/* ===== 顶部 ===== */
+.topbar{display:flex;align-items:center;gap:10px;padding:14px 0 18px}
+.topbar .logo{width:38px;height:38px;border-radius:10px;background:var(--red);color:#F3D27A;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0}
+.topbar .tt{font-size:17px;font-weight:700;color:var(--red-deep)}
+.topbar .sub{font-size:12px;color:var(--sub)}
+
+/* ===== 卡片 ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow)}
+.section-title{font-size:22px;font-weight:700;color:var(--red-deep);margin-bottom:6px}
+.section-desc{font-size:14px;color:var(--sub);margin-bottom:20px}
+
+/* ===== 首页 ===== */
+.hero{text-align:center;padding:10px 0 18px}
+.hero h1{font-size:30px;font-weight:900;color:var(--red-deep);letter-spacing:1px}
+.hero .tag{display:inline-block;margin-top:12px;font-size:13px;color:var(--gold);background:#FBF6EC;border:1px solid #EADfc6;border-radius:999px;padding:5px 14px}
+.hero .qcount{margin-top:14px;font-size:13px;color:var(--sub)}
+.field{margin-bottom:22px}
+.field-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.field-label::before{content:"";width:4px;height:15px;background:var(--red);border-radius:2px}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.opts.two{grid-template-columns:repeat(2,1fr)}
+.opt{border:1.5px solid var(--line);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;font-size:15px;font-weight:500;background:#FCFAF6;transition:all .15s;user-select:none}
+.opt small{display:block;font-size:11px;color:var(--sub);margin-top:2px;font-weight:400}
+.opt.active{border-color:var(--red);background:var(--red-soft);color:var(--red-deep);font-weight:700}
+.opt.active small{color:var(--red)}
+/* 题型模式 */
+.mode-opts{display:flex;flex-direction:column;gap:10px}
+.mode-opt{border:1.5px solid var(--line);border-radius:12px;padding:13px 16px;cursor:pointer;background:#FCFAF6;transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mode-opt .mt{font-size:15px;font-weight:600}
+.mode-opt .md{font-size:12px;color:var(--sub)}
+.mode-opt .md b{color:var(--red)}
+.mode-opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid #D9D0C2;flex-shrink:0;position:relative}
+.mode-opt.active{border-color:var(--red);background:var(--red-soft)}
+.mode-opt.active .mt{color:var(--red-deep)}
+.mode-opt.active .dot{border-color:var(--red)}
+.mode-opt.active .dot::after{content:"";position:absolute;top:3px;left:3px;width:10px;height:10px;border-radius:50%;background:var(--red)}
+.types{display:flex;gap:10px;flex-wrap:wrap}
+.type-chip{flex:1;min-width:130px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#FCFAF6;font-size:13px;color:var(--sub)}
+.type-chip b{display:block;font-size:14px;color:var(--ink);margin-bottom:2px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:13px 16px;background:#FCFAF6;cursor:pointer}
+.toggle-row .tx{font-size:14px;font-weight:500}
+.toggle-row .tx small{display:block;font-size:12px;color:var(--sub);font-weight:400}
+.switch{width:44px;height:25px;border-radius:999px;background:#D8D0C4;position:relative;transition:background .2s;flex-shrink:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:left .2s}
+.switch.on{background:var(--red)}
+.switch.on::after{left:22px}
+.btn{display:block;width:100%;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:active{background:var(--red-deep)}
+.btn-ghost{background:#fff;color:var(--red-deep);border:1.5px solid var(--red)}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{flex:1}
+
+/* ===== 答题 ===== */
+.quiz-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.progress{flex:1;height:8px;background:#ECE5D9;border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--red),#D65A4A);border-radius:999px;transition:width .3s}
+.quiz-head .pno{font-size:13px;color:var(--sub);white-space:nowrap;font-weight:500}
+.qbadge{display:inline-block;font-size:12px;font-weight:700;padding:3px 11px;border-radius:6px;margin-bottom:14px}
+.qbadge.choice{background:#E8F0FB;color:#1F5E9E}
+.qbadge.fill{background:#F3ECF9;color:#7B3FB0}
+.qbadge.short{background:var(--red-soft);color:var(--red-deep)}
+.qtitle{font-size:19px;font-weight:700;line-height:1.6;margin-bottom:20px}
+.qtitle .qn{color:var(--red);margin-right:6px}
+/* 选择题 */
+.choices{display:flex;flex-direction:column;gap:11px}
+.choice-item{display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;cursor:pointer;background:#FCFAF6;font-size:15px;transition:all .15s}
+.choice-item .key{width:26px;height:26px;border-radius:8px;border:1.5px solid #D9D0C2;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--sub);flex-shrink:0}
+.choice-item.selected{border-color:var(--red);background:var(--red-soft)}
+.choice-item.selected .key{background:var(--red);border-color:var(--red);color:#fff}
+.choice-item.correct{border-color:var(--green);background:var(--green-bg)}
+.choice-item.correct .key{background:var(--green);border-color:var(--green);color:#fff}
+.choice-item.wrong{border-color:var(--red);background:var(--red-soft)}
+.choice-item.wrong .key{background:var(--red);border-color:var(--red);color:#fff}
+.choice-item.disabled{cursor:default;pointer-events:none}
+/* 填空题 */
+.fill-hint{font-size:17px;font-weight:600;line-height:2;background:#FCFAF6;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.fill-input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-size:16px;font-family:inherit;background:#FCFAF6;outline:none}
+.fill-input:focus{border-color:var(--red)}
+.fill-input.correct{border-color:var(--green);background:var(--green-bg)}
+.fill-input.wrong{border-color:var(--red);background:var(--red-soft)}
+/* 简答题 */
+.reveal-note{font-size:14px;color:var(--sub);background:#FCFAF6;border:1px dashed #D9D0C2;border-radius:12px;padding:16px;text-align:center;margin-bottom:14px}
+.answer-box{background:#FCFAF6;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:10px;padding:16px 18px;font-size:15px;white-space:pre-wrap;line-height:1.9;margin-bottom:16px}
+.answer-box .lab{display:block;font-size:12px;color:var(--red);font-weight:700;margin-bottom:8px}
+.feedback{margin-top:16px}
+.feedback .verdict{font-size:15px;font-weight:700;margin-bottom:12px}
+.feedback .verdict.ok{color:var(--green)}
+.feedback .verdict.no{color:var(--red)}
+.foot-actions{margin-top:22px}
+
+/* ===== 结果页 ===== */
+.score-hero{text-align:center;padding:14px 0 20px}
+.score-ring{width:150px;height:150px;margin:0 auto 14px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.score-ring .num{font-size:44px;font-weight:900;color:var(--red-deep);line-height:1}
+.score-ring .den{font-size:15px;color:var(--sub)}
+.score-ring .pct{font-size:13px;color:var(--gold);margin-top:4px;font-weight:700}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.stat{border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center;background:#FCFAF6}
+.stat .n{font-size:22px;font-weight:800;color:var(--red-deep)}
+.stat .n.g{color:var(--green)}
+.stat .n.r{color:var(--red)}
+.stat .l{font-size:12px;color:var(--sub);margin-top:2px}
+.wrong-list-title{font-size:16px;font-weight:700;margin:6px 0 12px;display:flex;align-items:center;gap:6px}
+.wrong-list-title::before{content:"";width:4px;height:16px;background:var(--red);border-radius:2px}
+.wrong-item{border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:11px;background:#FCFAF6}
+.wrong-item .wt{font-size:14px;font-weight:700;margin-bottom:8px}
+.wrong-item .wt .qn{color:var(--red);margin-right:5px}
+.wrong-item .row{font-size:13px;margin-bottom:4px;display:flex;gap:8px}
+.wrong-item .row .k{color:var(--sub);flex-shrink:0;width:56px}
+.wrong-item .row .v.your{color:var(--red)}
+.wrong-item .row .v.right{color:var(--green)}
+.empty-wrong{text-align:center;color:var(--green);font-size:15px;font-weight:700;padding:18px;background:var(--green-bg);border-radius:12px}
+
+@media(max-width:480px){
+  .wrap{padding:14px 12px 50px}
+  .card{padding:18px 15px;border-radius:14px}
+  .hero h1{font-size:25px}
+  .opts{grid-template-columns:repeat(2,1fr)}
+  .qtitle{font-size:17px}
+  .stat-grid{gap:7px}
+  .section-title{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="logo serif">党</div>
+    <div><div class="tt serif">党建应知应会刷题</div><div class="sub">随机抽题 · 选择/填空/简答 · 错题总结</div></div>
+  </div>
+
+  <!-- ===== 视图：首页 ===== -->
+  <div id="view-home" class="card">
+    <div class="hero">
+      <h1 class="serif">应知应会100题</h1>
+      <div class="tag">每次随机抽题 · 打乱顺序 · 强化记忆</div>
+    </div>
+    <div class="field">
+      <div class="field-label">题型模式</div>
+      <div class="mode-opts" id="mode-opts">
+        <div class="mode-opt active" data-m="all">
+          <div><div class="mt">全部混合</div><div class="md">选择、填空、简答一起练</div></div><div class="dot"></div>
+        </div>
+        <div class="mode-opt" data-m="obj">
+          <div><div class="mt">只做选择 / 填空</div><div class="md">客观题，共 <b>30</b> 题</div></div><div class="dot"></div>
+        </div>
+        <div class="mode-opt" data-m="short">
+          <div><div class="mt">只做简答</div><div class="md">主观题，共 <b>71</b> 题</div></div><div class="dot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">本次刷题数量</div>
+      <div class="opts" id="count-opts"></div>
+    </div>
+    <div class="field">
+      <div class="toggle-row" id="wrong-priority">
+        <div class="tx">错题优先<small id="wp-desc">优先抽取你之前答错的题</small></div>
+        <div class="switch" id="wp-switch"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn-start">开始刷题</button>
+  </div>
+
+  <!-- ===== 视图：答题 ===== -->
+  <div id="view-quiz" class="card hidden">
+    <div class="quiz-head">
+      <div class="progress"><i id="progress-bar" style="width:0%"></i></div>
+      <div class="pno" id="pno-text">1 / 20</div>
+    </div>
+    <div id="quiz-body"></div>
+  </div>
+
+  <!-- ===== 视图：结果 ===== -->
+  <div id="view-result" class="card hidden">
+    <div id="result-body"></div>
+  </div>
+</div>
+
+<script>
+/* ===== 题库数据（共100题） ===== */
+var QUESTIONS = [{"n":1,"t":"申请入党的基本条件","a":"年满十八岁的中国工人、农民、军人、知识分子和其他社会阶层的先进分子，承认党的纲领和章程，愿意参加党的一个组织并在其中积极工作、执行党的决议和按期交纳党费的，可以申请加入中国共产党。","s":false},{"n":2,"t":"共产党员的基本条件","a":"中国共产党党员是中国工人阶级的有共产主义觉悟的先锋战士。\n中国共产党党员必须全心全意为人民服务，不惜牺牲个人的一切，为实现共产主义奋斗终身。\n中国共产党党员永远是劳动人民的普通一员。除了法律和政策规定范围内的个人利益和工作职权以外，所有共产党员都不得谋求任何私利和特权。","s":false},{"n":3,"t":"党员义务","a":"(1)认真学习马克思列宁主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观、习近平新时代中国特色社会主义思想，学习党的路线、方针、政策和决议，学习党的基本知识，学习科学、文化、法律和业务知识，努力提高为人民服务的本领。\n(2)贯彻执行党的基本路线和各项方针、政策，带头参加改革开放和社会主义现代化建设，带动群众为经济发展和社会进步艰苦奋斗，在生产、工作、学习和社会生活中起先锋模范作用。\n(3)坚持党和人民的利益高于一切，个人利益服从党和人民的利益，吃苦在前，享受在后，克己奉公，多做贡献。\n(4)自觉遵守党的纪律，首先是党的政治纪律和政治规矩，模范遵守国家的法律法规，严格保守党和国家的秘密，执行党的决定，服从组织分配，积极完成党的任务。\n(5)维护党的团结和统一，对党忠诚老实，言行一致，坚决反对一切派别组织和小集团活动，反对阳奉阴违的两面派行为和一切阴谋诡计。\n(6)切实开展批评和自我批评，勇于揭露和纠正违反党的原则的言行和工作中的缺点、错误，坚决同消极腐败现象作斗争。\n(7)密切联系群众，向群众宣传党的主张，遇事同群众商量，及时向党反映群众的意见和要求，维护群众的正当利益。\n(8)发扬社会主义新风尚，带头实践社会主义核心价值观和社会主义荣辱观，提倡共产主义道德，弘扬中华民族传统美德，为了保护国家和人民的利益，在一切困难和危险的时刻挺身而出，英勇斗争，不怕牺牲。","s":false},{"n":4,"t":"党员权利","a":"(1)参加党的有关会议，阅读党的有关文件，接受党的教育和培训。\n(2)在党的会议上和党报党刊上，参加关于党的政策问题的讨论。\n(3)对党的工作提出建议和倡议。\n(4)在党的会议上有根据地批评党的任何组织和任何党员，向党负责地揭发、检举党的任何组织和任何党员违法乱纪的事实，要求处分违法乱纪的党员，要求罢免或撤换不称职的干部。\n(5)行使表决权、选举权，有被选举权。\n(6)在党组织讨论决定对党员的党纪处分或作出鉴定时，本人有权参加和进行申辩，其他党员可以为他作证和辩护。\n(7)对党的决议和政策如有不同意见，在坚决执行的前提下，可以声明保留，并且可以把自己的意见向党的上级组织直至中央提出。\n(8)向党的上级组织直至中央提出请求、申诉和控告，并要求有关组织给以负责的答复。","s":false},{"n":5,"t":"党的性质","a":"中国共产党是中国工人阶级的先锋队，同时是中国人民和中华民族的先锋队，是中国特色社会主义事业的领导核心，代表中国先进生产力的发展要求，代表中国先进文化的前进方向，代表中国最广大人民的根本利益。","s":false},{"n":6,"t":"党的最高理想和最终目标","a":"实现共产主义。","s":true,"c":"实现共产主义","b":["实现______","共产主义"]},{"n":7,"t":"党的宗旨","a":"全心全意为人民服务。","s":true,"c":"全心全意为人民服务","b":["全心全意为______服务","人民"]},{"n":8,"t":"党的行动指南","a":"中国共产党以马克思列宁主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观、习近平新时代中国特色社会主义思想作为自己的行动指南。","s":false},{"n":9,"t":"习近平新时代中国特色社会主义思想","a":"习近平新时代中国特色社会主义思想，是对马克思列宁主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观的继承和发展，是马克思主义中国化最新成果，是党和人民实践经验和集体智慧的结晶，是中国特色社会主义理论体系的重要组成部分，是全党全国人民为实现中华民族伟大复兴而奋斗的行动指南，必须长期坚持并不断发展。","s":false},{"n":10,"t":"党的纲领","a":"党的纲领包括最低纲领和最高纲领两部分。最高纲领是实现共产主义，这是始终不变的。最低纲领则是根据革命或建设的发展阶段的客观实际不同而有所不同。最低纲领和最高纲领也可以称为运动的最近目的和最高目的。我国社会主义初级阶段的基本纲领，是建设有中国特色社会主义经济、政治、文化的基本目标和基本政策。这是整个社会主义初级阶段的奋斗纲领。","s":false},{"n":11,"t":"党章","a":"党章即党的章程，是一个政党为保证全党在政治上，思想上的一致和组织上，行动上的统一所制定的章程。一个党的党章的主要内容应该包括该党的性质、指导思想、纲领任务、组织结构、组织制度，党员的条件、权利、义务和纪律等项。通常衡量一个政党是否成熟党章也是关键因素之一。党章是政党的宗旨和行为规范。中国共产党现行党章于中国共产党第十九次全国代表大会部分修改，于2017年10月24日通过，是我们党的立党之本。党章作为党的根本大法，是全党每一个党员需要概无例外地共同遵守的行为准则。","s":false},{"n":12,"t":"中国共产党党徽","a":"中国共产党党徽为镰刀和锤头组成的图案。","s":true,"c":"镰刀和锤头","b":["党徽为镰刀和______组成的图案","锤头"]},{"n":13,"t":"中国共产党党旗","a":"中国共产党党旗为旗面缀有金黄色党徽图案的红旗。","s":true,"c":"缀有金黄色党徽图案的红旗","b":["党旗为旗面缀有金黄色______图案的红旗","党徽"]},{"n":14,"t":"中国特色社会主义最本质的特征","a":"中国共产党领导","s":true,"c":"中国共产党领导","b":["中国特色社会主义最本质的特征是______","中国共产党领导"]},{"n":15,"t":"党领导的主要形式","a":"思想领导、政治领导、组织领导。","s":true,"c":"思想领导、政治领导、组织领导","b":["党领导的主要形式：思想领导、政治领导、______","组织领导"]},{"n":16,"t":"党的思想路线","a":"一切从实际出发，理论联系实际，实事求是，在实践中检验真理和发展真理。","s":false},{"n":17,"t":"社会主义初级阶段基本路线（新时期党的政治路线）","a":"领导和团结全国各族人民，以经济建设为中心，坚持四项基本原则，坚持改革开放，自力更生，艰苦创业，为把我国建设成为富强民主文明和谐美丽的社会主义现代化强国而奋斗。","s":false},{"n":18,"t":"党的群众路线","a":"一切为了群众，一切依靠群众，从群众中来，到群众中去，把党的正确主张变为群众的自觉行动。","s":false},{"n":19,"t":"新时代党的组织路线","a":"全面贯彻新时代中国特色社会主义思想，以组织体系建设为重点，着力培养忠诚干净担当的高素质干部，着力集聚爱国奉献的各方面优秀人才，坚持德才兼备、以德为先、任人唯贤，为坚持和加强党的全面领导、坚持和发展中国特色社会主义提供坚强组织保证。","s":false},{"n":20,"t":"新时代我国社会主要矛盾","a":"中国特色社会主义进入新时代，我国社会主要矛盾已经转化为人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾。","s":false},{"n":21,"t":"“两个一百年”奋斗目标","a":"在新世纪新时代，经济和社会发展的战略目标是，到建党一百年时，全面建成小康社会；到新中国成立一百年时，全面建成社会主义现代化强国。","s":false},{"n":22,"t":"四项基本原则","a":"坚持社会主义道路、坚持人民民主专政、坚持中国共产党的领导、坚持马克思列宁主义毛泽东思想。","s":false},{"n":23,"t":"党的三大历史任务","a":"推进现代化建设、完成祖国统一、维护世界和平与促进共同发展。","s":false},{"n":24,"t":"四个伟大","a":"伟大斗争、伟大工程、伟大事业、伟大梦想。实现中华民族伟大复兴是近代以来中华民族最伟大的梦想。实现伟大梦想，必须进行伟大斗争。实现伟大梦想，必须建设伟大工程。实现伟大梦想，必须推进伟大事业。","s":false},{"n":25,"t":"“五位一体”总体布局","a":"经济建设、政治建设、文化建设、社会建设、生态文明建设。","s":false},{"n":26,"t":"“四个全面”战略布局","a":"全面建成小康社会、全面深化改革、全面依法治国、全面从严治党。","s":false},{"n":27,"t":"五大发展理念","a":"创新、协调、绿色、开放、共享。","s":true,"c":"创新、协调、绿色、开放、共享","b":["五大发展理念：创新、协调、______、开放、共享","绿色"]},{"n":28,"t":"中国共产党人的初心和使命","a":"为中国人民谋幸福，为中华民族谋复兴。","s":true,"c":"为中国人民谋幸福，为中华民族谋复兴","b":["为中国人民谋幸福，为中华民族谋______","复兴"]},{"n":29,"t":"中国梦","a":"实现中华民族伟大复兴，是近代以来中国人民最伟大的梦想，称之为“中国梦”。其具体表现是国家富强、民族振兴、人民幸福。","s":false},{"n":30,"t":"新时代","a":"十九大报告指出，中国发展新的历史方位——中国特色社会主义进入了新时代。这是一个重大判断。","s":false},{"n":31,"t":"新使命","a":"十九大报告指出，实现中华民族伟大复兴就是新时代中国共产党的历史使命，这也是近代以来中华民族最伟大的梦想。","s":false},{"n":32,"t":"新征程","a":"十九大报告指出，进入新时代，实现伟大梦想，必须进行伟大斗争、建设伟大工程、推进伟大事业。","s":false},{"n":33,"t":"中国道路、中国精神、中国力量","a":"中国道路就是中国特色社会主义道路；\n中国精神就是以爱国主义为核心的民族精神和以改革开放为核心的时代精神；\n中国力量就是全国各族人民大团结的力量。","s":false},{"n":34,"t":"党面临的四大考验","a":"执政考验、改革开放考验、市场经济考验、外部环境考验。","s":false},{"n":35,"t":"党面临的四大危险","a":"精神懈怠的危险、能力不足的危险、脱离群众的危险、消极腐败的危险。","s":false},{"n":36,"t":"两个坚决维护","a":"坚决维护习近平总书记党中央核心、全党核心地位，坚决维护以习近平同志为核心的党中央权威和集中统一领导。","s":false},{"n":37,"t":"四自能力","a":"自我净化、自我完善、自我革新、自我提高能力。","s":true,"c":"自我净化、自我完善、自我革新、自我提高能力","b":["四自能力：自我净化、自我完善、自我______、自我提高","革新"]},{"n":38,"t":"四个自信","a":"道路自信、理论自信、制度自信、文化自信。","s":true,"c":"道路自信、理论自信、制度自信、文化自信","b":["四个自信：道路自信、理论自信、______、文化自信","制度自信"]},{"n":39,"t":"四个意识","a":"政治意识、大局意识、核心意识、看齐意识。","s":true,"c":"政治意识、大局意识、核心意识、看齐意识","b":["四个意识：政治意识、大局意识、______、看齐意识","核心意识"]},{"n":40,"t":"党的三大作风","a":"理论联系实际、密切联系群众、批评与自我批评。","s":true,"c":"理论联系实际、密切联系群众、批评与自我批评","b":["党的三大作风：理论联系实际、______、批评与自我批评","密切联系群众"]},{"n":41,"t":"两个务必","a":"务必使同志们继续保持谦虚、谨慎、不骄、不躁的作风，务必使同志们继续地保持艰苦奋斗的作风”。","s":false},{"n":42,"t":"三严三实","a":"严以修身、严以用权、严以律已，谋事要实、创业要实、做人要实。","s":false},{"n":43,"t":"两学一做","a":"学党章党规、学系列讲话，做合格党员。","s":true,"c":"学党章党规、学系列讲话，做合格党员","b":["两学一做：学党章党规、学系列讲话，做______","合格党员"]},{"n":44,"t":"四讲四有","a":"“四讲四有”即讲政治、有信念，讲规矩、有纪律，讲道德、有品行，讲奉献、有作为。","s":false},{"n":45,"t":"四个合格","a":"“四个合格”是政治合格、执行纪律合格、品德合格、发挥作用合格。","s":false},{"n":46,"t":"七大战略","a":"科教兴国战略、人才强国战略、创新驱动发展战略、乡村振兴战略、区域协调发展战略、可持续发展战略、军民融合发展战略。","s":false},{"n":47,"t":"习总书记提出的“五大思维”","a":"战略思维、创新思维、辩证思维、法治思维、底线思维。","s":true,"c":"战略思维、创新思维、辩证思维、法治思维、底线思维","b":["五大思维：战略思维、创新思维、______、法治思维、底线思维","辩证思维"]},{"n":48,"t":"五位一体","a":"建设中国特色社会主义，总布局是经济建设、政治建设、文化建设、社会建设、生态文明建设五位一体。五位一体总布局是一个有机整体，其中经济建设是根本，政治建设是保证，文化建设是灵魂，社会建设是条件，生态文明建设是基础。","s":false},{"n":49,"t":"治国理政“八项本领”","a":"学习本领、政治领导本领、改革创新本领、科学发展本领、依法执政本领、群众工作本领、狠抓落实本领、驾驭风险本领。","s":false},{"n":50,"t":"中华民族“三个历史性飞跃”","a":"站起来、富起来、强起来。","s":true,"c":"站起来、富起来、强起来","b":["三个历史性飞跃：站起来、富起来、______","强起来"]},{"n":51,"t":"社会主义核心价值观","a":"富强、民主、文明、和谐；\n自由、平等、公正、法治；\n爱国、敬业、诚信、友善。","s":false},{"n":52,"t":"八荣八耻","a":"以热爱祖国为荣，以危害祖国为耻；以服务人民为荣，以背离人民为耻；以崇尚科学为荣，以愚昧无知为耻；以辛勤劳动为荣，以好逸恶劳为耻；以团结互助为荣，以损人利己为耻；以诚实守信为荣，以见利忘义为耻；以遵纪守法为荣，以违法乱纪为耻；以艰苦奋斗为荣，以骄奢淫逸为耻。","s":false},{"n":53,"t":"十九大对党章做了哪些重大修改","a":"习近平新时代中国特色社会主义思想写入党章，作为行动指南；中国特色社会主义文化写入党章；实现中华民族伟大复兴的中国梦写入党章；党章根据我国社会主要矛盾的转化作出相应修改；推进国家治理体系和治理能力现代化写入党章；供给侧结构性改革、“绿水青山就是金山银山”写入党章；人类命运共同体、“一带一路”写入党章；全面从严治党、四个意识写入党章；“党是领导一切的”写入党章；实现巡视全覆盖、推进“两学一做”写入党章。","s":false},{"n":54,"t":"一带一路","a":"丝绸之路经济带，21世纪海上丝绸之路。","s":true,"c":"丝绸之路经济带，21世纪海上丝绸之路","b":["一带一路：丝绸之路经济带，______","21世纪海上丝绸之路"]},{"n":55,"t":"供给侧结构性改革","a":"供给侧结构性改革，重点是解放和发展社会生产力，用改革的办法推进结构调整，减少无效和低端供给，扩大有效和中高端供给，增强供给结构对需求变化的适应性和灵活性，提高全要素生产率。供给侧结构性改革的根本，是使我国供给能力更好满足广大人民日益增长、不断升级和个性化的物质文化和生态环境需要，从而实现社会主义生产目的。","s":false},{"n":56,"t":"互联网+","a":"通俗来说，“互联网+”就是“互联网+各个传统行业”，但这并不是简单的两者相加，而是利用信息通信技术以及互联网平台，让互联网与传统行业进行深度融合，创造新的发展生态。","s":false},{"n":57,"t":"新时代辽宁精神","a":"“长子情怀、忠诚担当、创新实干、奋斗自强。”","s":true,"c":"长子情怀、忠诚担当、创新实干、奋斗自强","b":["新时代辽宁精神：长子情怀、忠诚担当、______、奋斗自强","创新实干"]},{"n":58,"t":"新时代党的建设总要求","a":"坚持和加强党的全面领导，坚持党要管党、全面从严治党，以加强党的长期执政能力建设、先进性和纯洁性建设为主线，以党的政治建设为统领，以坚定理想信念宗旨为根基，以调动全党积极性、主动性、创造性为着力点，全面推进党的政治建设、思想建设、组织建设、作风建设、纪律建设，把制度建设贯穿其中，深入推进反腐败斗争，不断提高党的建设质量，把党建设成为始终走在时代前列、人民衷心拥护、勇于自我革命、经得起各种风浪考验、朝气蓬勃的马克思主义执政党。","s":false},{"n":59,"t":"党的民主集中制“四个服从”","a":"党员个人服从党的组织，少数服从多数，下级组织服从上级组织，全党各个组织和全体党员服从党的全国代表大会和中央委员会。","s":false},{"n":60,"t":"党委、党总支、党支部、党小组","a":"（1）党委。一般情况下，党员人数超过100名的基层单位，经上级党组织批准，可成立党的基层委员会。有的基层单位党员人数虽然不足100名，但因特殊情况和工作需要，经上级党组织批准，也可以成立党的基层委员会。\n（2）党总支。党员人数超过50名的基层单位，经上级党组织批准，可成立党的总支部委员会。有的基层单位党员人数虽然不足50名，但因特殊情况和工作需要，经上级党组织批准，也可以成立党总支委员会。\n（3）党支部。正式党员人数超过3名、不足50名的基层单位，经上级党组织批准，可成立党支部。其中，党员人数超过7名的，应设支部委员会；党员人数不足7名的，只设书记1人，必要时可设副书记1名。正式党员人数虽然不足3名的，可以和邻近单位的党员成立联合党支部。\n（4）党小组。党小组是党支部的组成部分，不是党的一级组织。党员数量少的党支部可以不划分党小组。党小组在党支部的统一领导下，负责对党员的教育和管理，直接组织和指导每个党员的日常活动，使之发挥先锋模范作用，保证党的路线、方针、政策及各项决议得到贯彻落实。","s":false},{"n":61,"t":"党支部的职责","a":"党支部是党的基础组织，是党组织开展工作的基本单元，是党在社会基层组织中的战斗堡垒，是党的全部工作和战斗力的基础，担负直接教育党员、管理党员、监督党员和组织群众、宣传群众、凝聚群众、服务群众的职责。","s":false},{"n":62,"t":"“三会一课”制度","a":"支部党员大会（每季度召开1次）、支部委员会（每个月召开1次）、党小组会（一般每月召开1-2次）、党课（每季度上一次党课）。","s":false},{"n":63,"t":"民主生活会制度","a":"党委（党组）民主生活会每年召开1次，一般安排在第四季度。","s":false},{"n":64,"t":"组织生活会制度","a":"党支部（党小组）以交流思想、总结经验教训、开展批评与自我批评为中心内容的组织生活制度。党支部（党小组）组织生活会一般每半年召开一次。","s":false},{"n":65,"t":"民主评议党员制度","a":"党支部按照有关规定，定期组织党员开展民主评议的一种制度。民主评议党员要在党委领导下，以支部为单位进行，每年进行一次。","s":false},{"n":66,"t":"谈心谈话制度","a":"党支部应当经常开展谈心谈话。党支部委员之间、党支部委员和党员之间、党员和党员之间，每年谈心谈话一般不少于1次。谈心谈话应当坦诚相见、交流思想、交换意见、帮助提高。","s":false},{"n":67,"t":"双重组织生活","a":"党员领导干部既要参加所在单位的党支部、党小组的组织生活会，又要参加党员领导干部单独召开的民主生活会。","s":false},{"n":68,"t":"五好党支部","a":"支部班子好、党员队伍好、活动开展好、制度建设好、作用发挥好。","s":false},{"n":69,"t":"发展党员工作原则","a":"发展党员工作应当贯彻党的基本理论、基本路线、基本纲领、基本经验、基本要求，按照控制总量、优化结构、提高质量、发挥作用的总要求，坚持党章规定的党员标准，始终把政治标准放在首位； 坚持慎重发展、均衡发展，有领导、有计划地进行； 坚持入党自愿原则和个别吸收原则，成熟一个，发展一个。禁止突击发展，反对“关门主义”。","s":false},{"n":70,"t":"党员发展工作程序","a":"五个阶段25个环节。（1）递交入党申请书；（2）党组织派人谈话；（3）推荐和确定入党积极分子；（4）上级党委备案；（5）指定培养联系人；（6）培养教育考察；（7）确定发展对象；（8）报上级党委备案；（9）确定入党介绍人；（10）进行政治审查；（11）开展集中培训；（12）支部委员会审查；（13）上级党委预审；（14）填写入党志愿书；（15）支部大会讨论；（16）上级党委派人谈话；（17）上级党委审批；（18）再上一级党委组织部门备案；（19）编入党支部和党小组；（20）入党宣誓；（21）继续教育考察；（22）提出转正申请；（23）支部大会讨论；（24）上级党委审批；（25）材料归档。","s":false},{"n":71,"t":"入党誓词","a":"我志愿加入中国共产党，拥护党的纲领，遵守党的章程，履行党员义务，执行党的决定，严守党的纪律，保守党的秘密，对党忠诚，积极工作，为共产主义奋斗终身，随时准备为党和人民牺牲一切，永不叛党。","s":false},{"n":72,"t":"党员的党籍和党龄有什么区别","a":"党籍，是指党员资格，是党员履行入党手续后，从组织上得到承认的依据。就是说，一个同志被批准入了党，取得了预备党员资格就算有了党籍。党龄，是指成为正式党员的年龄，是党员转正后经过的年数。党籍和党龄是有区别的，党员从上级党委批准为预备党员之日起，就取得了党籍；由预备党员转为正式党员之后才有党龄。","s":false},{"n":73,"t":"如何端正入党动机？","a":"为了献身共产主义事业，更好地为人民服务，这是唯一正确的入党动机。树立这一正确的入党动机，不能靠天生，也不能靠后天自然形成，而只能通过不断地的学习、实践和改造主观世界，在此基础上和过程中逐步形成。第一，要认真学习马克思主义理论，确立正确的入党动机。第二，要通过实践锻炼，不断端正入党动机。第三，要加强主观世界改造，加强党性修养，克服部正确的入党动机。第四，端正入党动机，不是入党前一时的问题，而是一辈子的事情，要活到老，学到老，改造到老。","s":false},{"n":74,"t":"如何充分发挥学生党员的先锋模范作用？","a":"一是在政治上讲学结合当表率，做党的理论路线方针政策宣传者；二是在学习上力争上游当标兵，做钻研科学、勇攀高峰的探索者；三是在工作上一丝不苟当公仆，做朋辈帮扶、互助友爱的践行者；四是在作风上严谨朴实当楷模，做脚踏实地、雷厉风行的开拓者；五是在生活上勤俭自律当标杆；做艰苦奋斗、遵纪守法的守护者；六是在素质上全面提升当典范，做就业创业、志愿服务的争先者。","s":false},{"n":75,"t":"宣传思想工作的“两个巩固”","a":"习近平总书记支出，宣传思想工作就是要巩固马克思主义在意识\n形态领域的指导地位，巩固全党全国人民团结奋斗的共同思想基础。“两个巩固”是党的宣传思想工作的根本任务。","s":false},{"n":76,"t":"全面推进依法治国总目标","a":"建设中国特色社会主义法治体系，建设社会主义法治国家。","s":false},{"n":77,"t":"四个“铁一般”","a":"铁一般信仰、铁一般信念、铁一般纪律、铁一般担当的干部队伍。","s":false},{"n":78,"t":"党员干部心中“四有”","a":"心中有党、心中有民、心中有责、心中有戒。","s":true,"c":"心中有党、心中有民、心中有责、心中有戒","b":["心中四有：心中有党、心中有民、______、心中有戒","心中有责"]},{"n":79,"t":"好干部20字标准","a":"信念坚定、为民服务、勤政务实、敢于担当、清正廉洁。","s":true,"c":"信念坚定、为民服务、勤政务实、敢于担当、清正廉洁","b":["好干部20字标准：信念坚定、为民服务、勤政务实、______、清正廉洁","敢于担当"]},{"n":80,"t":"领导干部要做到的“五个过硬”","a":"信念过硬、政治过硬、责任过硬、能力过硬、作风过硬。","s":true,"c":"信念过硬、政治过硬、责任过硬、能力过硬、作风过硬","b":["五个过硬：信念过硬、政治过硬、______、能力过硬、作风过硬","责任过硬"]},{"n":81,"t":"党的六大纪律","a":"政治纪律、组织纪律、廉洁纪律、群众纪律、工作纪律、生活纪律。","s":false},{"n":82,"t":"党风廉政建设“两个责任”","a":"党委主体责任和纪委监督责任。","s":true,"c":"党委主体责任和纪委监督责任","b":["两个责任：党委主体责任和______","纪委监督责任"]},{"n":83,"t":"党的政治规矩","a":"党的政治规矩包括四个方面：第一，党章是全党必须遵循的总章程，也是总规矩；第二，党的纪律是刚性约束，政治纪律更是全党在政治方向、政治立场、政治言论、政治行动方面必须遵守的刚性约束；第三，国家法律是党员、干部必须遵守的规矩；第四，党在长期实践中形成的优良传统和工作惯例。","s":false},{"n":84,"t":"党内政治生活“四性”","a":"政治性、时代性、原则性、战斗性。","s":true,"c":"政治性、时代性、原则性、战斗性","b":["党内政治生活四性：政治性、时代性、______、战斗性","原则性"]},{"n":85,"t":"中央八项规定","a":"改进调查研究；精简会议活动；精简文件简报；规范出访活动；改进警卫工作；改进新闻报道；严格文稿发表；厉行勤俭节约。","s":false},{"n":86,"t":"党员廉洁自律基本内容","a":"坚持公私分明，先公后私，克己奉公；\n坚持崇廉拒腐，清白做人，干净做事；\n坚持尚俭戒奢，艰苦朴素，勤俭节约；\n坚持吃苦在前，享受在后，甘于奉献。","s":false},{"n":87,"t":"党员领导干部廉洁自律基本内容","a":"廉洁从政，自觉保持人民公仆本色；\n廉洁用权，自觉维护人民根本利益；\n廉洁修身，自觉提升思想道德境界；\n廉洁齐家，自觉带头树立良好家风","s":false},{"n":88,"t":"四风","a":"形式主义、官僚主义、享乐主义和奢靡之风。","s":true,"c":"形式主义、官僚主义、享乐主义和奢靡之风","b":["四风：形式主义、官僚主义、______和奢靡之风","享乐主义"]},{"n":89,"t":"“三不腐”机制","a":"构建不敢腐、不能腐、不想腐的有效机制。","s":true,"c":"不敢腐、不能腐、不想腐","b":["三不腐：不敢腐、不能腐、______","不想腐"]},{"n":90,"t":"对党员的五种纪律处分","a":"警告、严重警告、撤销党内职务、留党察看、开除党籍。","s":true,"c":"警告、严重警告、撤销党内职务、留党察看、开除党籍","b":["五种纪律处分：警告、严重警告、______、留党察看、开除党籍","撤销党内职务"]},{"n":91,"t":"监督执纪“四种形态”","a":"党内关系要正常化，批评和自我批评要经常开展，让咬耳扯袖、红脸出汗成为常态;党纪轻处分和组织处理要成为大多数;对严重违纪的重处分、作出重大职务调整应当是少数;而严重违纪涉嫌违法立案审查的只能是极极少数。","s":false},{"n":92,"t":"“六有”政治局面","a":"又有集中又有民主，又有纪律又有自由，又有统一意志、又有个人心情舒畅、生动活泼的政治局面。","s":false},{"n":93,"t":"四个重要法宝","a":"坚持民主集中制、开展批评和自我批评、严格党内生活、坚持党性原则基础上的团结。","s":false},{"n":94,"t":"党员做到“三个出来”","a":"平常时候看得出来、关键时刻站得出来、危急关头豁得出来。","s":false},{"n":95,"t":"四个自我","a":"自我净化、自我完善、自我革新、自我提高。","s":true,"c":"自我净化、自我完善、自我革新、自我提高","b":["四个自我：自我净化、自我完善、自我革新、______","自我提高"]},{"n":96,"t":"党员“十二个不准”（1）党员不准散布违背党的理论和路线方针政策的言论；","a":"（2）党员不准公开发表违背党中央决定的言论；\n（3）党员不准泄露党和国家秘密；\n（4）党员不准参与非法组织和非法活动；\n（5）党员不准制造、传播政治谣言及丑化党和国家形象的言论；\n（6）党员不准搞封建迷信；\n（7）党员不准信仰宗教；\n（8）党员不准参与邪教；\n（9）党员不准纵容和支持宗教极端势力、民族分裂势力、暴力恐怖势力及其活动；\n（10）党员、干部特别是高级干部不准在党内搞小山头、小圈子、小团伙；\n（11）领导机关和领导干部不准以任何理由和名义纵容、唆使、暗示或强迫下级说假话\n（12）党内不准搞拉拉扯扯、吹吹拍拍、阿谀奉承。","s":false},{"n":97,"t":"习近平总书记对新时代青年的希望和要求（16字箴言）","a":"“勤学、修德、明辨、笃实、爱国、励志、求真、力行”","s":true,"c":"勤学、修德、明辨、笃实、爱国、励志、求真、力行","b":["16字箴言：勤学、修德、明辨、笃实、爱国、励志、求真、______","力行"]},{"n":98,"t":"辽宁工程技术大学校训","a":"诚朴求是 博学笃行","s":true,"c":"诚朴求是 博学笃行","b":["辽工大校训：诚朴求是，______","博学笃行"]},{"n":99,"t":"辽宁工程技术大学“太阳石精神”","a":"朴实无华 坚韧顽强 无私奉献","s":true,"c":"朴实无华 坚韧顽强 无私奉献","b":["太阳石精神：朴实无华、坚韧顽强、______","无私奉献"]},{"n":100,"t":"辽宁工程技术大学第三次党代会提出的学校“五大发展战略”","a":"特色发展战略、质量提升战略、创新驱动战略、人才强校战略、文化引领战略。","s":false},{"n":101,"t":"发展党员的新“十六字”方针","a":"控制总量、优化结构、提高质量、发挥作用。","s":true,"c":"控制总量、优化结构、提高质量、发挥作用","b":["十六字方针：控制总量、优化结构、______、发挥作用","提高质量"]}];
+
+/* ===== 工具函数 ===== */
+function el(id){return document.getElementById(id);}
+function escapeHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function norm(s){return String(s||'').replace(/[\s，。、；：“”‘’（）()·.,;:"'!！?？\-—_＿]/g,'');}
+var TYPE_NAME={choice:'选择题',fill:'填空题',short:'简答题'};
+
+/* ===== 全局状态 ===== */
+var state={
+  total:20, priorityWrong:false,
+  session:[], index:0, records:[],
+  wrongSet:JSON.parse(localStorage.getItem('dq_wrong_set')||'[]')
+};
+function saveWrongSet(){localStorage.setItem('dq_wrong_set',JSON.stringify(state.wrongSet));}
+
+/* ===== 视图切换 ===== */
+function show(v){
+  ['home','quiz','result'].forEach(function(x){el('view-'+x).classList.toggle('hidden',x!==v);});
+  window.scrollTo(0,0);
+}
+
+/* ===== 短题分组（用于生成高迷惑性干扰项：结构、项数、主题相近） ===== */
+var GROUPS={
+  g1:[37,38,39,57,78,84,88,95,101],  // 四项并列（四X系列）
+  g2:[27,47,79,80,90,97],            // 五项及以上长列举
+  g3:[15,40,43,50,89,99],            // 三项并列
+  g4:[6,7,12,13,14],                 // 短语/单句
+  g5:[28,54,82,98]                   // 两项对仗
+};
+var QGROUP={};
+Object.keys(GROUPS).forEach(function(g){GROUPS[g].forEach(function(n){QGROUP[n]=g;});});
+
+/* ===== 填空题模板：pre + parts[0] + seps[0] + ... + parts[last] + post；每次随机挖空一个 part ===== */
+var FILL_TPL={
+  6:{pre:'',parts:['实现','共产主义'],seps:[''],post:''},
+  7:{pre:'',parts:['全心全意为','人民','服务'],seps:['',''],post:''},
+  12:{pre:'党徽为',parts:['镰刀','锤头'],seps:['和'],post:'组成的图案'},
+  13:{pre:'党旗为旗面缀有',parts:['金黄色','党徽','图案的红旗'],seps:['',''],post:''},
+  15:{pre:'党领导的主要形式：',parts:['思想领导','政治领导','组织领导'],seps:['、','、'],post:''},
+  27:{pre:'五大发展理念：',parts:['创新','协调','绿色','开放','共享'],seps:['、','、','、','、'],post:''},
+  28:{pre:'',parts:['为中国人民谋幸福','为中华民族谋','复兴'],seps:['，',''],post:''},
+  37:{pre:'四自能力：',parts:['自我净化','自我完善','自我革新','自我提高'],seps:['、','、','、'],post:''},
+  38:{pre:'四个自信：',parts:['道路自信','理论自信','制度自信','文化自信'],seps:['、','、','、'],post:''},
+  39:{pre:'四个意识：',parts:['政治意识','大局意识','核心意识','看齐意识'],seps:['、','、','、'],post:''},
+  40:{pre:'党的三大作风：',parts:['理论联系实际','密切联系群众','批评与自我批评'],seps:['、','、'],post:''},
+  43:{pre:'两学一做：',parts:['学党章党规','学系列讲话','做合格党员'],seps:['、','，'],post:''},
+  47:{pre:'五大思维：',parts:['战略思维','创新思维','辩证思维','法治思维','底线思维'],seps:['、','、','、','、'],post:''},
+  50:{pre:'三个历史性飞跃：',parts:['站起来','富起来','强起来'],seps:['、','、'],post:''},
+  54:{pre:'一带一路：',parts:['丝绸之路经济带','21世纪海上丝绸之路'],seps:['，'],post:''},
+  57:{pre:'新时代辽宁精神：',parts:['长子情怀','忠诚担当','创新实干','奋斗自强'],seps:['、','、','、'],post:''},
+  78:{pre:'心中四有：',parts:['心中有党','心中有民','心中有责','心中有戒'],seps:['、','、','、'],post:''},
+  79:{pre:'好干部20字标准：',parts:['信念坚定','为民服务','勤政务实','敢于担当','清正廉洁'],seps:['、','、','、','、'],post:''},
+  80:{pre:'五个过硬：',parts:['信念过硬','政治过硬','责任过硬','能力过硬','作风过硬'],seps:['、','、','、','、'],post:''},
+  82:{pre:'两个责任：',parts:['党委主体责任','纪委监督责任'],seps:['和'],post:''},
+  84:{pre:'党内政治生活四性：',parts:['政治性','时代性','原则性','战斗性'],seps:['、','、','、'],post:''},
+  88:{pre:'四风：',parts:['形式主义','官僚主义','享乐主义','奢靡之风'],seps:['、','、','和'],post:''},
+  89:{pre:'三不腐：',parts:['不敢腐','不能腐','不想腐'],seps:['、','、'],post:''},
+  90:{pre:'五种纪律处分：',parts:['警告','严重警告','撤销党内职务','留党察看','开除党籍'],seps:['、','、','、','、'],post:''},
+  95:{pre:'四个自我：',parts:['自我净化','自我完善','自我革新','自我提高'],seps:['、','、','、'],post:''},
+  97:{pre:'16字箴言：',parts:['勤学','修德','明辨','笃实','爱国','励志','求真','力行'],seps:['、','、','、','、','、','、','、'],post:''},
+  98:{pre:'辽工大校训：',parts:['诚朴求是','博学笃行'],seps:['，'],post:''},
+  99:{pre:'太阳石精神：',parts:['朴实无华','坚韧顽强','无私奉献'],seps:['、','、'],post:''},
+  101:{pre:'十六字方针：',parts:['控制总量','优化结构','提高质量','发挥作用'],seps:['、','、','、'],post:''}
+};
+/* 特殊题：手写多个挖空候选（含整词挖空） */
+var FILL_RAW={
+  14:[
+    {blankText:'中国特色社会主义最本质的特征是______',answer:'中国共产党领导'},
+    {blankText:'中国特色社会主义最本质的特征是______共产党领导',answer:'中国'},
+    {blankText:'中国特色社会主义最本质的特征是中国______领导',answer:'共产党'},
+    {blankText:'中国特色社会主义最本质的特征是中国共产党______',answer:'领导'}
+  ]
+};
+function genFills(tpl){
+  var fills=[];
+  for(var idx=0;idx<tpl.parts.length;idx++){
+    var seg=[tpl.pre];
+    for(var i=0;i<tpl.parts.length;i++){
+      seg.push(i===idx?'______':tpl.parts[i]);
+      if(i<tpl.parts.length-1)seg.push(tpl.seps[i]);
+    }
+    seg.push(tpl.post);
+    fills.push({blankText:seg.join(''),answer:tpl.parts[idx]});
+  }
+  return fills;
+}
+QUESTIONS.forEach(function(q){
+  if(!q.s)return;
+  if(FILL_RAW[q.n])q.fills=FILL_RAW[q.n];
+  else if(FILL_TPL[q.n])q.fills=genFills(FILL_TPL[q.n]);
+});
+
+/* ===== 为短题生成选择题数据 ===== */
+function makeChoiceItem(q,shorts){
+  var seen={};seen[q.c]=1;var opts=[q.c];
+  var myGroup=QGROUP[q.n];
+  // 优先从同组（结构/主题相近）抽干扰项
+  var same=shuffle(shorts.filter(function(x){return x.n!==q.n&&QGROUP[x.n]===myGroup;}));
+  for(var i=0;i<same.length&&opts.length<4;i++){if(!seen[same[i].c]){seen[same[i].c]=1;opts.push(same[i].c);}}
+  // 同组不足，再从其他组补
+  if(opts.length<4){
+    var other=shuffle(shorts.filter(function(x){return x.n!==q.n&&QGROUP[x.n]!==myGroup;}));
+    for(var i=0;i<other.length&&opts.length<4;i++){if(!seen[other[i].c]){seen[other[i].c]=1;opts.push(other[i].c);}}
+  }
+  shuffle(opts);  // 打乱正确答案所在位置
+  return {type:'choice',q:q,options:opts,answer:q.c};
+}
+function makeItem(q,shorts){
+  if(q.s){
+    if(Math.random()<0.5){return makeChoiceItem(q,shorts);}
+    var f=q.fills[Math.floor(Math.random()*q.fills.length)];
+    return {type:'fill',q:q,blankText:f.blankText,answer:f.answer};
+  }
+  return {type:'short',q:q,answer:q.a};
+}
+
+/* ===== 模式对应的抽题池 ===== */
+function poolForMode(mode){
+  if(mode==='obj')return QUESTIONS.filter(function(q){return q.s;});
+  if(mode==='short')return QUESTIONS.filter(function(q){return !q.s;});
+  return QUESTIONS.slice();
+}
+
+/* ===== 构建一次刷题会话 ===== */
+function buildSession(total,priorityWrong,mode){
+  var shorts=QUESTIONS.filter(function(q){return q.s;});
+  var pool=poolForMode(mode);
+  var chosen=[];
+  if(priorityWrong&&state.wrongSet.length){
+    var wq=shuffle(pool.filter(function(q){return state.wrongSet.indexOf(q.n)>=0;}));
+    chosen=wq.slice(0,Math.min(total,wq.length));
+    var have={};chosen.forEach(function(q){have[q.n]=1;});
+    var rest=shuffle(pool.filter(function(q){return !have[q.n];}));
+    for(var i=0;i<rest.length&&chosen.length<total;i++)chosen.push(rest[i]);
+  }else{
+    chosen=shuffle(pool.slice()).slice(0,total);
+  }
+  state.session=chosen.map(function(q){return makeItem(q,shorts);});
+  state.records=[];state.index=0;
+}
+function buildSessionFrom(qs){
+  var shorts=QUESTIONS.filter(function(q){return q.s;});
+  state.session=shuffle(qs.slice()).map(function(q){return makeItem(q,shorts);});
+  state.records=[];state.index=0;
+}
+
+/* ===== 渲染当前题 ===== */
+function render(){
+  var item=state.session[state.index],total=state.session.length;
+  el('pno-text').textContent=(state.index+1)+' / '+total;
+  el('progress-bar').style.width=(state.index/total*100)+'%';
+  var body=el('quiz-body');
+  if(item.type==='choice')renderChoice(item,body);
+  else if(item.type==='fill')renderFill(item,body);
+  else renderShort(item,body);
+}
+function isLast(){return state.index===state.session.length-1;}
+function next(){state.index++;if(state.index>=state.session.length){renderResult();}else{render();}}
+function record(item,correct,user,right){
+  state.records.push({n:item.q.n,title:item.q.t,type:item.type,correct:correct,user:user,right:right});
+  var i=state.wrongSet.indexOf(item.q.n);
+  if(!correct&&i<0)state.wrongSet.push(item.q.n);
+  if(correct&&i>=0)state.wrongSet.splice(i,1);
+  saveWrongSet();
+}
+function nextBtnText(){return isLast()?'查看结果':'下一题';}
+
+/* ===== 选择题 ===== */
+function renderChoice(item,body){
+  var KEYS=['A','B','C','D'];
+  var html='<div class="qbadge choice">选择题</div>';
+  html+='<div class="qtitle"><span class="qn">'+item.q.n+'.</span>'+escapeHtml(item.q.t)+'</div><div class="choices">';
+  item.options.forEach(function(o,i){
+    html+='<div class="choice-item" data-i="'+i+'"><div class="key">'+KEYS[i]+'</div><div>'+escapeHtml(o)+'</div></div>';
+  });
+  html+='</div><div class="foot-actions hidden" id="foot"><button class="btn btn-primary" id="next">'+nextBtnText()+'</button></div>';
+  body.innerHTML=html;
+  var selected=null;
+  body.querySelectorAll('.choice-item').forEach(function(ci){
+    ci.onclick=function(){
+      if(selected!==null)return;
+      selected=parseInt(ci.dataset.i,10);
+      var correct=item.options[selected]===item.answer;
+      body.querySelectorAll('.choice-item').forEach(function(x,i){
+        x.classList.add('disabled');
+        if(item.options[i]===item.answer)x.classList.add('correct');
+        else if(i===selected)x.classList.add('wrong');
+      });
+      record(item,correct,item.options[selected],item.answer);
+      el('foot').classList.remove('hidden');
+      el('next').onclick=next;
+    };
+  });
+}
+
+/* ===== 填空题 ===== */
+function checkFill(val,answer){
+  var n=norm(val),a=norm(answer);
+  if(n.length<2)return false;
+  return n===a||a.indexOf(n)>=0||n.indexOf(a)>=0;
+}
+function renderFill(item,body){
+  var hint=item.blankText.replace(/_{2,}/g,'<span style="color:var(--red);font-weight:800">＿＿＿＿</span>');
+  var html='<div class="qbadge fill">填空题</div>';
+  html+='<div class="qtitle"><span class="qn">'+item.q.n+'.</span>请填入正确内容</div>';
+  html+='<div class="fill-hint">'+hint+'</div>';
+  html+='<input class="fill-input" id="fill-in" placeholder="输入答案" autocomplete="off">';
+  html+='<div class="feedback hidden" id="fill-fb"></div>';
+  html+='<div class="foot-actions" id="foot"><button class="btn btn-primary" id="submit">确认</button></div>';
+  body.innerHTML=html;
+  var input=el('fill-in'),done=false;
+  try{input.focus();}catch(e){}
+  function submit(){
+    if(done)return;done=true;
+    var val=input.value;
+    var correct=checkFill(val,item.answer);
+    input.disabled=true;
+    input.classList.add(correct?'correct':'wrong');
+    var fb=el('fill-fb');fb.classList.remove('hidden');
+    fb.innerHTML='<div class="verdict '+(correct?'ok':'no')+'">'+(correct?'回答正确':'回答不正确')+'</div>'+
+      (correct?'':'<div style="font-size:14px;color:var(--sub)">正确答案：<span style="color:var(--green);font-weight:600">'+escapeHtml(item.answer)+'</span></div>');
+    record(item,correct,val||'（未作答）',item.answer);
+    var btn=el('submit');btn.textContent=nextBtnText();btn.onclick=next;
+  }
+  el('submit').onclick=submit;
+  input.onkeydown=function(e){if(e.key==='Enter')submit();};
+}
+
+/* ===== 简答题 ===== */
+function renderShort(item,body){
+  var html='<div class="qbadge short">简答题</div>';
+  html+='<div class="qtitle"><span class="qn">'+item.q.n+'.</span>'+escapeHtml(item.q.t)+'</div>';
+  html+='<div class="reveal-note">先在脑海中回忆答案，再点击按钮对照参考答案自评</div>';
+  html+='<div class="foot-actions" id="reveal-foot"><button class="btn btn-ghost" id="reveal">显示参考答案</button></div>';
+  html+='<div id="after-reveal"></div>';
+  body.innerHTML=html;
+  el('reveal').onclick=function(){
+    el('reveal-foot').classList.add('hidden');
+    var ar=el('after-reveal');
+    ar.innerHTML='<div class="answer-box"><span class="lab">参考答案</span>'+escapeHtml(item.answer)+'</div>';
+    ar.innerHTML+='<div class="btn-row"><button class="btn btn-ghost" id="got">我答对了</button><button class="btn btn-primary" id="miss">我没答对</button></div>';
+    el('got').onclick=function(){selfEval(true);};
+    el('miss').onclick=function(){selfEval(false);};
+  };
+  function selfEval(correct){
+    record(item,correct,correct?'自评：答对':'自评：未答对',item.answer);
+    var ar=el('after-reveal');
+    ar.innerHTML+='<div class="foot-actions"><button class="btn btn-primary" id="next">'+nextBtnText()+'</button></div>';
+    el('next').onclick=next;
+  }
+}
+
+/* ===== 结果页 ===== */
+function evalText(p){
+  if(p===100)return '满分！全部掌握';
+  if(p>=90)return '优秀，继续保持';
+  if(p>=75)return '良好，再巩固错题';
+  if(p>=60)return '及格，重点复习错题';
+  return '还需多加练习';
+}
+function renderResult(){
+  show('result');
+  var recs=state.records,total=recs.length;
+  var cc=recs.filter(function(r){return r.correct;}).length;
+  var pct=Math.round(cc/total*100);
+  var html='<div class="score-hero">';
+  html+='<div class="score-ring" style="background:conic-gradient(var(--red) '+(pct*3.6)+'deg,#ECE5D9 0deg)">';
+  html+='<div style="position:absolute;top:12px;left:12px;right:12px;bottom:12px;background:var(--card);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center">';
+  html+='<div class="num">'+cc+'<span class="den"> / '+total+'</span></div>';
+  html+='<div class="pct">正确率 '+pct+'%</div></div></div>';
+  html+='<div style="font-size:16px;font-weight:700;color:var(--red-deep);margin-top:6px">'+evalText(pct)+'</div></div>';
+  html+='<div class="stat-grid">';
+  ['choice','fill','short'].forEach(function(t){
+    var rs=recs.filter(function(r){return r.type===t;});
+    var c=rs.filter(function(r){return r.correct;}).length;
+    html+='<div class="stat"><div class="n">'+c+'<span style="font-size:14px;color:var(--sub)">/'+rs.length+'</span></div><div class="l">'+TYPE_NAME[t]+'</div></div>';
+  });
+  html+='</div>';
+  var wrongs=recs.filter(function(r){return !r.correct;});
+  if(wrongs.length){
+    html+='<div class="wrong-list-title">错题总结（'+wrongs.length+' 题）</div>';
+    wrongs.forEach(function(r){
+      html+='<div class="wrong-item"><div class="wt"><span class="qn">'+r.n+'.</span>'+escapeHtml(r.title)+'</div>';
+      html+='<div class="row"><span class="k">你的答案</span><span class="v your">'+escapeHtml(r.user)+'</span></div>';
+      html+='<div class="row"><span class="k">正确答案</span><span class="v right">'+escapeHtml(r.right)+'</span></div></div>';
+    });
+  }else{
+    html+='<div class="empty-wrong">全部答对，没有错题</div>';
+  }
+  html+='<div class="btn-row" style="margin-top:18px">';
+  if(wrongs.length)html+='<button class="btn btn-ghost" id="redo">错题重做</button>';
+  html+='<button class="btn btn-primary" id="restart">重新抽题</button></div>';
+  el('result-body').innerHTML=html;
+  if(wrongs.length)el('redo').onclick=function(){
+    var nums=wrongs.map(function(r){return r.n;});
+    buildSessionFrom(QUESTIONS.filter(function(q){return nums.indexOf(q.n)>=0;}));
+    show('quiz');render();
+  };
+  el('restart').onclick=function(){refreshHome();show('home');};
+}
+
+/* ===== 首页交互 ===== */
+var MODE_CONF={
+  all:{counts:[20,30,50,100]},
+  obj:{counts:[20,30]},
+  short:{counts:[20,30,50,71]}
+};
+var COUNT_LABEL={20:'快速',30:'常规',50:'强化',71:'全部',100:'全部'};
+var selMode='all',selCount=20,priorityWrong=false;
+
+function renderCountOpts(){
+  var counts=MODE_CONF[selMode].counts;
+  var box=el('count-opts');
+  box.classList.toggle('two',counts.length===2);
+  box.innerHTML='';
+  counts.forEach(function(n){
+    var d=document.createElement('div');
+    d.className='opt'+(n===selCount?' active':'');
+    d.dataset.n=n;
+    d.innerHTML=n+'<small>'+(COUNT_LABEL[n]||'')+'</small>';
+    d.onclick=function(){setCount(n);};
+    box.appendChild(d);
+  });
+}
+function setCount(n){
+  selCount=n;
+  el('count-opts').querySelectorAll('.opt').forEach(function(x){
+    x.classList.toggle('active',parseInt(x.dataset.n,10)===n);
+  });
+}
+document.querySelectorAll('#mode-opts .mode-opt').forEach(function(o){
+  o.onclick=function(){
+    selMode=o.dataset.m;
+    document.querySelectorAll('#mode-opts .mode-opt').forEach(function(x){
+      x.classList.toggle('active',x.dataset.m===selMode);
+    });
+    var counts=MODE_CONF[selMode].counts;
+    if(counts.indexOf(selCount)<0)selCount=counts[0];
+    renderCountOpts();
+  };
+});
+function refreshHome(){
+  el('wp-desc').textContent=state.wrongSet.length?('你有 '+state.wrongSet.length+' 道错题，将优先抽取'):'暂无错题记录';
+}
+el('wrong-priority').onclick=function(){
+  priorityWrong=!priorityWrong;
+  el('wp-switch').classList.toggle('on',priorityWrong);
+};
+el('btn-start').onclick=function(){
+  buildSession(selCount,priorityWrong,selMode);
+  show('quiz');render();
+};
+renderCountOpts();
+refreshHome();
+</script>
+</body>
+</html>
